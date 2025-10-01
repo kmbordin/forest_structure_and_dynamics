@@ -6,7 +6,7 @@
 ### Description: ForestPlots network data generates data in stem-level, 
 # so we can find multi-stemmed trees instead of individuals
 
-### In this code wefix this issue by creating a new data frame grouping 
+### In this code we fix this issue by creating a new data frame grouping 
 # all multi-stemmed trees to only one individual (with the largest diameter).
 # The information of number of stems is also retained.
 
@@ -16,7 +16,7 @@ library(tidyverse)
 stem2abund <- function (data, census.number){ # dataset and number of census to summarise info
   
   #' @description generate abundance-level information
-  #' @author Kauane Maiara Bordin
+  #' @author Kauane Maiara Bordin (kauanembordin[at]gmail.com)
   #' @param  data frame with stem-level data 
   #' @return data frame with abundance-level data
   #' census.number: 1 == applies for all available censuses; 2, 3 or 4: filters census 2 to 4.
