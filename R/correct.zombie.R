@@ -25,6 +25,7 @@ library(tidyverse)
 # use latitude instead of Latitude.Decimal
 # use longitude instead of Longitude.Decimal
 # use census.n instead of Census.No
+# use d instead of D4 
 
 correct.zombie <- function (data){
   
