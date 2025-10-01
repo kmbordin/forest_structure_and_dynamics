@@ -74,3 +74,6 @@ correct.zombie <- function (data){
   return(result)
 }
 
+# usage: ------------------------------------------------------------------ 
+# data.correct.for.zombie <- correct.zombie (data = data)
+
