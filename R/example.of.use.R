@@ -12,3 +12,5 @@ library(tidyverse)
 # load functions ------
 source("R/stem2abund.R")
 source("R/correct.zombie.R")
+source("R/correct.diameter.R")
+
