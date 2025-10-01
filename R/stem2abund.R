@@ -54,8 +54,8 @@ stem2abund <- function (data, census.number){ # dataset and number of census to 
   return(x2)
 }
 
-# usage: 
-data.abund.all.censuses <- stem2abund(data = data.stem, census.number = 1)
-data.abund.census2 <- stem2abund(data = data.stem, census.number = 2)
-data.abund.census3 <- stem2abund(data = data.stem, census.number = 3)
-data.abund.census4 <- stem2abund(data = data.stem, census.number = 4)
+# usage: ------------------------------------------------------------------ 
+# data.abund.all.censuses <- stem2abund(data = data.stem, census.number = 1)
+# data.abund.census2 <- stem2abund(data = data.stem, census.number = 2)
+# data.abund.census3 <- stem2abund(data = data.stem, census.number = 3)
+# data.abund.census4 <- stem2abund(data = data.stem, census.number = 4)
