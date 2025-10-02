@@ -1,7 +1,7 @@
 ############################################################
 ############## STEM TO ABUNDANCE-LEVEL #####################
 ############################################################
-### Code developed by Kauane M Bordin at 01 Oct 2025
+### Code updated by Kauane M Bordin at 02 Oct 2025
 
 ### Description: ForestPlots network data generates data in stem-level, 
 # so we can find multi-stemmed trees instead of individuals
@@ -23,12 +23,13 @@ stem2abund <- function (data, census.number){ # dataset and number of census to 
   #' data: stem-level information from ForestPlots.net format
   
   x <- data %>% filter (Census.No == census.number) # filters the desired census
+  x = x %>% filter(F1 != "0") # F1 == 0 means dead stem - here we remove dead stems
   
   if(census.number == '2'){
-    x = x %>% filter(F1 != "0") # F1 == 0 means dead stem - here we remove dead stems
+    x = x %>% filter(F1 != "0") 
   }
   else{
-    x = x # if census number is 1, runs the code for all censuses
+    x = x # if census.number is 1, runs the code for all censuses in data
   }
   if(census.number == '3'){
     x = x %>% filter(F1 != "0")
