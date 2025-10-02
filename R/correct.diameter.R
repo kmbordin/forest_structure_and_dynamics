@@ -1,12 +1,12 @@
 ############################################################
 ##############  CORRECT DIAMETER  ##########################
 ############################################################
-### Code developed by Kauane M Bordin at 01 Oct 2025
+### Code updated by Kauane M Bordin at 02 Oct 2025
 
 ### Description: Sometimes long-term monitoring fails in tracking stem diameter
 # and we observe abnormal absolute growth rates (positive or negative).
 
-### In this code we fix this issue by setting a limit of maximum growth rates (positive =  4 cm/yr, negative = -0.5cm/yr) for each stem. 
+### In this code we fix this issue by setting a limit of maximum growth rates (positive ==  4 cm/yr, negative == -0.5cm/yr) for each stem. 
 # If the stems show abnormal growth, the corrections applied here assume 0 growth rates to avoid 
 # any kind of bias. If the stem shows positive abnormal growth, we set dbh in census 2 as default;
 # If the stem shows negative abnormal growth, we set dbh in census 1 as default.
@@ -39,7 +39,7 @@ correct.diameter <- function (data,census.n,dbh){
   #' census.number: 1 == applies for all available censuses; 2, 3 or 4: filters census 2 to 4.
   #' data: stem-level information from ForestPlots.net format, but be careful with the required format for column names
   #' census.n: "1_2", "2_3" ... "6_7"
-  #' dbh = minimum dbh to apply the correction - please check your data! here dbh is in cm 
+  #' dbh: minimum dbh to apply the correction - please check your data! here dbh is in cm 
    
   ferns.families <- c("Cyatheaceae", "Dicksoniaceae","Pteridaceae") #fern families to be removed
   
@@ -67,6 +67,7 @@ correct.diameter <- function (data,census.n,dbh){
       filter(plotcode %in% c2)
     data = bind_rows(census1,census2)
   }
+  
   if(census.n=="3_4"){ # data filtering for census 3 and 4
     #census1
     census1 = data %>% filter(census.n == 3) %>% 
@@ -79,6 +80,7 @@ correct.diameter <- function (data,census.n,dbh){
       filter(plotcode %in% c2)
     data = bind_rows(census1,census2)
   }
+  
   if(census.n=="4_5"){ # data filtering for census 4 and 5
     #census1
     census1 = data %>% filter(census.n == 4) %>% 
@@ -96,8 +98,9 @@ correct.diameter <- function (data,census.n,dbh){
     c2 = unique(census2$plotcode)
     census1 <- census1 %>% 
       filter(plotcode %in% c2)
-    data=bind_rows(census1,census2)
+    data = bind_rows(census1,census2)
   }
+  
   if(census.n=="6_7"){ # data filtering for census 6 and 7
     #census1
     census1 = data %>% filter(census.n == 6) %>% 
@@ -163,10 +166,10 @@ correct.diameter <- function (data,census.n,dbh){
                 names_prefix = "census") %>% 
     relocate(census1, .before = census2) %>% 
     mutate(gr =(census2-census1)/census.interv) %>% # calculate absolute growth rates per year in cm
-    mutate(gr2 = ifelse(gr < (-0.5), (-0.5), gr), # test for abnormal negative growth -- if the absolute growth is lower than -0.5, set the value as -0.5 to be filtered next
-           gr.corr = ifelse(gr2 < 4, gr2, 4), # test for abnormal positive growth -- if the growth is larger than 4, set the value as 4 to be filtered next
-           d1.cor = ifelse(gr.corr == (4), census2, census1), # if census 2 has larger dbh than census 1, we determined dbh2 == dbh1 by setting dbh2 as default, thus dbh1 will be corrected to dbh1 == dbh2
-           d2.cor = ifelse(gr.corr == (-0.5), census1, census2),# if census 1 has larger dbh than census 2, we determined dbh1 == dbh2 by setting dbh1 as default, thus dbh2 will be corrected to dbh2 == dbh1
+    mutate(gr2 = ifelse(gr < (-0.5), "ab.neg", gr), # test for abnormal negative growth -- if the absolute growth is lower than -0.5, set the value as -0.5 to be filtered next
+           gr.corr = ifelse(gr2 > 4, "ab.pos", gr2), # test for abnormal positive growth -- if the growth is larger than 4, set the value as 4 to be filtered next
+           d1.cor = ifelse(gr.corr == "ab.pos", census2, census1), # if census 2 has larger dbh than census 1, we determined dbh2 == dbh1 by setting dbh2 as default, thus dbh1 will be corrected to dbh1 == dbh2
+           d2.cor = ifelse(gr.corr == "ab.neg", census1, census2),# if census 1 has larger dbh than census 2, we determined dbh1 == dbh2 by setting dbh1 as default, thus dbh2 will be corrected to dbh2 == dbh1
            d1.cor = ifelse(is.na(d1.cor), census1, d1.cor), # complete empty cells
            d2.cor = ifelse(is.na(d2.cor), census2, d2.cor), # complete empty cells
            d1.cor = ifelse(is.na(d1.cor), NA, d1.cor), # maintain NAs to be dropped later
