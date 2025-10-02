@@ -1,13 +1,13 @@
 ############################################################
 ##############  CORRECT ZOMBIE-TREES  ######################
 ############################################################
-### Code developed by Kauane M Bordin at 01 Oct 2025
+### Code updated by Kauane M Bordin at 02 Oct 2025
 
 ### Description: Sometimes long-term monitoring fails in tracking tree mortality
 # and trees assigned as dead can 're-appear' in the next census: they are called 
 # zombie-trees
 
-### In this code we fix this issue by a register for the stem that is alive in census1
+### In this code we fix this issue by adding a measurement for the stem that is alive in census1
 # dead in census2, and alive again in census3. We use the mean dbh between census1 and
 # census3 as stem dbh in census2. 
 
@@ -54,7 +54,7 @@ correct.zombie <- function (data){
                               census_set == "3" ~ 1)) %>%   # census 3 only
     right_join(dataset, by = "treeid")
     
-  # If there is a tree with status alive, dead, alive, they will receive a new line with the missing census info, and mean dbh, so they will become alive, alive, alive
+  # If there is a tree with status alive, dead, alive (1,3), they will receive a new line with the missing census info, and mean dbh, so they will become alive, alive, alive
   correct <-  result %>%
     filter(census_set == "1,3") %>%
     group_by(plotcode,plot.area,treeid,stem.gr.id,species,genus,family,latitude,longitude) %>%
@@ -69,8 +69,8 @@ correct.zombie <- function (data){
     bind_rows(correct)  %>%
     group_by(plotcode, census.n) %>%
     mutate(census.yr = ifelse(is.na(census.yr) & census.n == 2,
-                              yes = first(census.yr[!is.na(census.yr)]), # fill the census year of second census for the plot
-                              no = census.yr)) %>%
+                              yes = first(census.yr[!is.na(census.yr)]), 
+                              no = census.yr)) %>% # fill the census year of second census for the plot
     ungroup()
   return(result)
 }
