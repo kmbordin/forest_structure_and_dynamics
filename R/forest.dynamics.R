@@ -243,7 +243,7 @@ demography.and.dynamics <- function (survival,mortality,recruitment,metric){
     # final number of individuals (Nt)
     final.number <- full_join(surv.n.c2,rec.n.c2) %>% 
       mutate(across(recruits, coalesce, 0)) %>% #in case there is zero recruitment
-      mutate(Nt = (survivors)+(recruits))
+      mutate(Nt = (Nst)+(recruits))
     
     demographic_rates_per_plot <- data.frame(N0 = initial.number$N0,
                                              Nt = final.number$Nt,
@@ -257,7 +257,7 @@ demography.and.dynamics <- function (survival,mortality,recruitment,metric){
                     turnover = (ma+raf)/2) %>% 
       relocate(plotcode, .before = N0)
     
-    estimates <- left_join(demographic_rates_per_plot, by="plotcode")
+    estimates <- demographic_rates_per_plot
   }
   
   # retun data ----
@@ -273,4 +273,4 @@ demography.and.dynamics <- function (survival,mortality,recruitment,metric){
 # forest.dynamics <- demography.and.dynamics(survival = survival.carbon,
 #                                              recruitment = recruitment.carbon, 
 #                                              mortality = mortality.carbon,
-#                                              metric = "vital")
+#                                              metric = "carbon")
