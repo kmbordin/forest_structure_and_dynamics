@@ -30,7 +30,7 @@ library(tidyverse)
 # census.yr instead of Census.Date
 # census.yr in format as.numeric
 
-correct.diameter <- function (data,census.n,dbh){
+correct.diameter <- function (data,census.numb,dbh){
   
   #' @description correct diameter to avoid abnormal growth rates
   #' @author Kauane Maiara Bordin (kauanembordin[at]gmail.com)
@@ -44,18 +44,18 @@ correct.diameter <- function (data,census.n,dbh){
   ferns.families <- c("Cyatheaceae", "Dicksoniaceae","Pteridaceae") #fern families to be removed
   
   data <- data %>% 
-    filter(d >= d) %>%  # to ensure same dbh threshold for all stems. dbh must be in cm!
+    filter(d >= dbh) %>%  # to ensure same dbh threshold for all stems. dbh must be in cm!
     filter(! family %in% ferns.families) # remove ferns families
   
-  original.census.n = census.n # save original info
+  original.census.n = census.numb # save original info
   
-  if(census.n=="1_2") { # data filtering for census 1 and 2
+  if(census.numb=="1_2") { # data filtering for census 1 and 2
     census1 = data %>% filter(census.n == 1)
     census2 = data %>% filter(census.n == 2)
     data = bind_rows(census1,census2)
   }
   
-  if(census.n=="2_3"){ # data filtering for census 2 and 3
+  if(census.numb=="2_3"){ # data filtering for census 2 and 3
     #census1
     census1 = data %>% filter(census.n == 2) %>% 
       mutate(census.n = replace(census.n, census.n == "2", "1")) 
@@ -68,7 +68,7 @@ correct.diameter <- function (data,census.n,dbh){
     data = bind_rows(census1,census2)
   }
   
-  if(census.n=="3_4"){ # data filtering for census 3 and 4
+  if(census.numb=="3_4"){ # data filtering for census 3 and 4
     #census1
     census1 = data %>% filter(census.n == 3) %>% 
       mutate(census.n = replace(census.n, census.n == "3", "1")) 
@@ -81,7 +81,7 @@ correct.diameter <- function (data,census.n,dbh){
     data = bind_rows(census1,census2)
   }
   
-  if(census.n=="4_5"){ # data filtering for census 4 and 5
+  if(census.numb=="4_5"){ # data filtering for census 4 and 5
     #census1
     census1 = data %>% filter(census.n == 4) %>% 
       mutate(census.n = replace(census.n, census.n == "4", "1")) 
@@ -101,7 +101,7 @@ correct.diameter <- function (data,census.n,dbh){
     data = bind_rows(census1,census2)
   }
   
-  if(census.n=="6_7"){ # data filtering for census 6 and 7
+  if(census.numb=="6_7"){ # data filtering for census 6 and 7
     #census1
     census1 = data %>% filter(census.n == 6) %>% 
       mutate(census.n = replace(census.n, census.n == "6", "1")) 
@@ -117,6 +117,7 @@ correct.diameter <- function (data,census.n,dbh){
   # The code below aims to summarise the census, species, and plot information
   
   interval <- data %>%
+    ungroup() %>% 
     dplyr::select(plotcode,census.n, census.yr) %>% 
     group_by(plotcode, census.n) %>%
     mutate(original.census = original.census.n,
@@ -134,11 +135,13 @@ correct.diameter <- function (data,census.n,dbh){
   
   # summarise plot information
   data.summarised <- data %>% 
+    ungroup() %>% 
     dplyr::select(plotcode,plot.area,latitude,longitude) %>% 
     unique()
   
   # summarise census information
   data.summarised2 <- data %>% 
+    ungroup() %>% 
     dplyr::select(plotcode,census.yr,census.n) %>% 
     unique() %>% 
     group_by(plotcode) %>% 
@@ -148,7 +151,15 @@ correct.diameter <- function (data,census.n,dbh){
   
   #summarise species information
   data.summarised3 <- data %>% 
-    dplyr::select(species,family,genus) %>% 
+    ungroup() %>% 
+    dplyr::select(species,family,genus,WD,Height,treeid,census.n) %>% 
+    ungroup() %>% 
+    group_by(species) %>%
+    mutate(WD = coalesce(WD, unique(WD[!is.na(WD)]))) %>% # includes the WD of former zombie tree
+    ungroup() %>% 
+    group_by(treeid) %>%
+    mutate(Height = coalesce(mean(Height), unique(Height[!is.na(Height)]))) %>% # includes the mean height of former zombie tree
+    mutate(census.n = as.numeric(census.n)) %>% 
     unique()
   
   # the following code effectively corrects for the dbh between census 
@@ -157,8 +168,8 @@ correct.diameter <- function (data,census.n,dbh){
   # abnormal positive growth is higher than 4 cm/yr.
   
   correct.dbh <- data %>% 
-    dplyr:: select(plotcode, species, census.n, treeid, d, stem.gr.id,census.yr,census.n) %>%
-    left_join(interval, by = "plotcode") %>% # unite census info
+    dplyr:: select(plotcode, species, census.n, treeid, d, stem.gr.id,census.yr) %>%
+    left_join(interval, by = c("plotcode")) %>% # unite census info
     group_by(plotcode, species, census.n, treeid, d, stem.gr.id, census.interv,original.census) %>% # large grouping to avoid any mistakes on tree growth correction
     summarise(d = mean(d, na.rm = TRUE), .groups = "drop") %>% 
     pivot_wider(names_from = c(census.n),
@@ -185,11 +196,14 @@ correct.diameter <- function (data,census.n,dbh){
     left_join(data.summarised2, by = c("plotcode")) %>% 
     mutate(census.yr = NA,
            census.yr = ifelse(census.n == min(census.n), census.number1,census.yr),
-           census.yr = ifelse(census.n == max(census.n),census.number2, census.yr)) %>% 
+           census.yr = ifelse(census.n == max(census.n),census.number2, census.yr),
+           census.n = as.numeric(census.n)) %>% 
     dplyr::select(-c(census.number1,census.number2,original.time1,original.time2,census)) %>% 
     drop_na(d) %>% # drop the NA values in dbh
-    left_join(data.summarised3, by = "species") %>% # unite species info
-    dplyr::select(plotcode,plot.area,census.n,census.yr,treeid,stem.gr.id,species,d,genus,family,latitude,longitude) %>% 
+    ungroup() %>%
+    group_by(census.n,treeid,census.yr) %>% 
+    left_join(data.summarised3, by = c("species","census.n","treeid")) %>% # unite species info
+    dplyr::select(plotcode,plot.area,census.n,census.yr,treeid,stem.gr.id,species,d,genus,family,latitude,longitude,WD,Height) %>% 
     mutate(stem.gr.id = as.character(stem.gr.id))
   
   data <- correct.dbh # set the dataframe of corrected dbh as the default
