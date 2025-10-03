@@ -41,6 +41,8 @@ WD <- read.csv2(here::here("data","wd_total.csv")) %>%
   add_row(species = "Indet indet", WD= 0.54) %>%  # all species mean
   add_row(species = "Laplacea acutifolia", WD= 0.57) %>%  # genus
   add_row(species = "Myrcia indet", WD= 0.59) %>% # genus
+  add_row(species = "Myrcia floribunda", WD= 0.59) %>% # genus
+  
   add_row(species = "Ocotea indet", WD= 0.49) %>%  # genus
   add_row(species = "Prunus subcoriacea", WD= 0.60) %>% # genus
   add_row(species = "Xylosma pseudosalzmannii", WD= 0.65)  # genus
@@ -70,8 +72,6 @@ data.complete <- data %>%
   mutate(plot.area = ifelse(plot.area==0.34, yes=0.12,no=plot.area)) %>% 
   mutate(Height = ifelse(Height==0, yes=mean(Height, rm=T),no=Height)) %>% 
   mutate(Height = ifelse(Height==0, yes=mean(Height, rm=T),no=Height)) %>% 
-  filter(plotcode != "PRM-04") %>% 
-  filter(plotcode != "PRM-05") %>% 
   left_join(WD, by="species")
 
 
