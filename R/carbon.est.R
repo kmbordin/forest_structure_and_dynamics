@@ -50,7 +50,8 @@ carbon.est <- function (data, WD.info, H.info, dbh){
   ferns.families <- c("Cyatheaceae", "Dicksoniaceae","Pteridaceae") #fern families
   data <- data %>% 
     filter(d >= dbh) %>%  #to ensure same dbh threshold for all stems/dbh must be in cm
-    filter(! family %in% ferns.families) #remove fern families
+    filter(! family %in% ferns.families) %>%  #remove fern families
+    ungroup()
   
   if(WD.info==TRUE){
     WD <- data %>% 
