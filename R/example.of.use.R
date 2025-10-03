@@ -16,6 +16,8 @@ source("R/correct.diameter.R") # code 2
 source("R/carbon.est.R")       # code 3
 source("R/demography.R")       # code 4
 source("R/unmatch.stems.R")    # code 5, not required, but recommended 
+source("R/forest.dynamics.R")  # code 6
+
 
 data <- data.frame(plotcode = c(rep("A", 9), rep("B", 13)),
                                       plot.area = c(rep(1, 9), rep(0.2, 13)),
