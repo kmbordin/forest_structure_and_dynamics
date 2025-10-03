@@ -150,6 +150,15 @@ correct.diameter <- function (data,census.numb,dbh){
            census.number2 = `2`)
   
   #summarise species information
+  overall.height.mean <- mean(data$Height, na.rm = TRUE)
+  non_na_heights <- data$Height[!is.na(data$Height)]
+  
+  if (length(non_na_heights) > 0) {
+    overall.height.mean <- mean(non_na_heights)
+  } else {
+    overall.height.mean <- NA 
+  }
+  
   data.summarised3 <- data %>% 
     ungroup() %>% 
     dplyr::select(species,family,genus,WD,Height,treeid,census.n) %>% 
@@ -158,8 +167,9 @@ correct.diameter <- function (data,census.numb,dbh){
     mutate(WD = coalesce(WD, unique(WD[!is.na(WD)]))) %>% # includes the WD of former zombie tree
     ungroup() %>% 
     group_by(treeid) %>%
-    mutate(Height = coalesce(mean(Height), unique(Height[!is.na(Height)]))) %>% # includes the mean height of former zombie tree
-    mutate(census.n = as.numeric(census.n)) %>% 
+    mutate(Height1 = (mean(Height, na.rm = TRUE))) %>% # includes the mean height of former zombie tree
+    mutate(Height = coalesce(Height1,overall.height.mean),
+           census.n = as.numeric(census.n)) %>% 
     unique()
   
   # the following code effectively corrects for the dbh between census 
