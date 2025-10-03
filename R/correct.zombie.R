@@ -39,6 +39,9 @@ correct.zombie <- function (data){
     filter(census.n >=3) %>% # filter plots with three or more censuses
     dplyr::select(plotcode) %>%
     unique()
+  census.two <- data %>%
+    filter(!plotcode %in% census.three$plotcode) %>% # filter plots with less than three  censuses
+    unique()
   
   dataset <- data %>%
     filter(plotcode %in% census.three$plotcode) # filter data from plots with three or more censuses
@@ -71,7 +74,9 @@ correct.zombie <- function (data){
     mutate(census.yr = ifelse(is.na(census.yr) & census.n == 2,
                               yes = first(census.yr[!is.na(census.yr)]), 
                               no = census.yr)) %>% # fill the census year of second census for the plot
-    ungroup()
+    ungroup() %>% 
+    bind_rows(census.two)
+  
   return(result)
 }
 
