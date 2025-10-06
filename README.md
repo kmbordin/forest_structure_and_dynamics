@@ -3,7 +3,7 @@ author: "Kauane Maiara Bordin"
 date: "2025-10-06"
 ---
 
-# Forest structure and dynamics: standard codes
+# Forest structure and dynamics: standard codes 🌳
 
 These codes aim to standardise the data organisation and obtain structural and dynamics' parameters of forest communities. Forest structural parameters include analyses related to carbon storage and individual density, as well as taxonomic and functional diversity and composition. Forest dynamics' parameters, correspond to individual and carbon dynamics.
 
@@ -191,4 +191,4 @@ functional_census2 list
 ```
 See the example.of.use.R script for an example of sequence to run all codes and their outputs.
 
-If you find any inconsistency in the codes please contact kauanembordin[at]gmail.com :)
+If you find any inconsistency in the codes please contact kauanembordin[at]gmail.com :) 🌳
