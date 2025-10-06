@@ -1,7 +1,7 @@
 ############################################################
 ############## EXAMPLE OF CODES' USE ######################
 ############################################################
-### Code updated by Kauane M Bordin at 02 Oct 2025
+### Code updated by Kauane M Bordin at 04 Oct 2025
 
 ### Example of how to use the codes available in this project
 # please respect the order of each code!
@@ -14,7 +14,6 @@ library(FD)
 library(hillR)
 
 # load functions ------
-source("R/stem2abund.R")       # code 0, not a requirement!
 source("R/correct.zombie.R")   # code 1
 source("R/correct.diameter.R") # code 2
 source("R/carbon.est.R")       # code 3
@@ -109,3 +108,6 @@ all.diversity.metrics$community_matrix_c1
 all.diversity.metrics$community_matrix_c2
 all.diversity.metrics$functional_census1
 all.diversity.metrics$functional_census2
+
+
+
