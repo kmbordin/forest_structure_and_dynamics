@@ -1,17 +1,10 @@
 ---
-pdf_document: default
 author: "Kauane Maiara Bordin"
 date: "2025-10-06"
-output:
-  html_document:
-    df_print: paged
-  word_document: default
-  pdf_document: default
 title: "Codes to estimate parameters of forest structure and dynamics"
 ---
 
-```{r setup, include=FALSE,  message=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{}
 ```
 
 # Forest structure and dynamics: standard codes
