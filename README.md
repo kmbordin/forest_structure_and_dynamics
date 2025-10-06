@@ -1,11 +1,7 @@
 ---
 author: "Kauane Maiara Bordin"
 date: "2025-10-06"
-title: "Codes to estimate parameters of forest structure and dynamics"
 ---
-
-```{}
-```
 
 # Forest structure and dynamics: standard codes
 
