@@ -8,7 +8,7 @@
 
 ### In this code we calculate demographic rates and forest dynamics. 
 # Demographic rates are based on equations from Kohyama et al 2018 MEE and
-# Phillips et al 2008 Science
+# Phillips et al 1998 Science
 # Demographic rates require the dataset os survivors, recruits, and deads, metric='vital' derived from demography function
 # Forest dynamics are based on equations from Kohyama et al 2019 FEM
 # Forest dynamics requires the dataset os survivors, recruits, and deads, metric='carbon' derived from demography function
