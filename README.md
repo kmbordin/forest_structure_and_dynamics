@@ -189,3 +189,6 @@ functional_census2 list
     RaoQ: functional diversity (RaoQ) in census 2
     CWM: weighted mean traits per plot in census 2
 ```
+See the example.of.use.R script for an example of sequence to run all codes and their outputs.
+
+If you find any inconsistency in the codes please contact kauanembordin[at]gmail.com :)
