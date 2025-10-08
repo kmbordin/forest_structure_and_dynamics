@@ -9,7 +9,7 @@ These codes aim to standardise the data organisation and obtain structural and d
 
 ## Data for running the codes
 
-Data must be organised into tables where variables are always in columns and observations are in rows. The following table shows an example. If the data is not organised this way, there is a package under development called *Data Harmonization*, by Alliance for Tropical Forest Science ([https://github.com/Alliance-for-Tropical-Forest-Science/DataHarmonization](#0){.uri}). I can help you with the usage if necessary.
+Data must be organised into tables where variables are always in columns and observations are in rows. The following table shows an example. If the data is not organised this way, there is a package under development called *Data Harmonization*, by Alliance for Tropical Forest Science ([https://github.com/Alliance-for-Tropical-Forest-Science/DataHarmonization])
 
 ## Loading dataset
 
@@ -57,10 +57,11 @@ mutate(census.n = ifelse(census.yr %in% c(2000,2005),1,NA),
 ## Loading packages
 
 ```{text, message=FALSE}
-install.packages(BIOMASS);library(BIOMASS) #to estimate carbon
-install.packages(tidyverse);library(tidyverse) #data organisation
-install.packages(hillR);library(hillR) #diversity metrics
-install.packages(vegan);library(vegan) #diversity metrics
+install.packages(BIOMASS);library(BIOMASS) # to estimate carbon
+install.packages(tidyverse);library(tidyverse) # data organisation
+install.packages(hillR);library(hillR) # diversity metrics
+install.packages(vegan);library(vegan) # diversity metrics
+install.packages(FD);library(FD) # diversity metrics
 ```
 
 ## Loading functions
@@ -115,7 +116,7 @@ Description: calculates demographic rates (recruitment, mortality, turnover, ind
  "plotcode" - unique plot code
  "Bs0" - AGC of survivors in census 1 (t0)
  "B0" - AGC in census 1 (t0)
- "Bt" - AGC census 2 (t)
+ "Bt" - AGC census 2 (t1)
  "t" - time census interval in years
  "gains" - gains due to growth of survivors + recruits (Mg/ha)
  "incr.surv" - gains due to growth of survivors (Mg/ha/yr)
@@ -189,6 +190,6 @@ functional_census2 list
     RaoQ: functional diversity (RaoQ) in census 2
     CWM: weighted mean traits per plot in census 2
 ```
-See the example.of.use.R script for an example of sequence to run all codes and their outputs.
+See the `example.of.use.R` script for an example of sequence to run all codes and their outputs.
 
 If you find any inconsistency in the codes please contact kauanembordin[at]gmail.com :) 🌳
