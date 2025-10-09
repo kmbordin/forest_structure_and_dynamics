@@ -1,6 +1,6 @@
 ---
 author: "Kauane Maiara Bordin"
-date: "2025-10-06"
+date: "2025-10-08"
 ---
 
 # Forest structure and dynamics: standard codes 🌳
@@ -9,7 +9,7 @@ These codes aim to standardise the data organisation and obtain structural and d
 
 ## Data for running the codes
 
-Data must be organised into tables where variables are always in columns and observations are in rows. The following table shows an example. If the data is not organised this way, there is a package under development called *Data Harmonization*, by Alliance for Tropical Forest Science ([https://github.com/Alliance-for-Tropical-Forest-Science/DataHarmonization])
+Data must be organised into tables where variables are always in columns and observations are in rows. The following table shows an example. If the data is not organised this way, there is a package under development called *Data Harmonization*, by Alliance for Tropical Forest Science ([<https://github.com/Alliance-for-Tropical-Forest-Science/DataHarmonization>])
 
 ## Loading dataset
 
@@ -190,6 +190,9 @@ functional_census2 list
     RaoQ: functional diversity (RaoQ) in census 2
     CWM: weighted mean traits per plot in census 2
 ```
+
 See the `example.of.use.R` script for an example of sequence to run all codes and their outputs.
 
-If you find any inconsistency in the codes please contact kauanembordin[at]gmail.com :) 🌳
+Most recent news! I have been playing to develop a shiny.app to run these codes quick and easily. It is a very (*very)* simple version, but it is working for the default parameters so far. I will keep updating it when I have some spare time :)
+
+If you find **any** inconsistency in the codes **please** contact kauanembordin[at]gmail.com :) 🌳

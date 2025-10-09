@@ -54,6 +54,14 @@ data.complete <- data.frame(plotcode = c(rep("A", 9), rep("B", 13),rep("C",3)),
          WD = c(0.47,0.81,0.47,0.81,0.47,0.81,0.87,0.87,0.87,0.40,
                 0.62,0.72,0.40,0.62,0,0.81,0.81,0.81,0.81,0.81,0.81,0.81,0.62,0.47,0.62))
 
+trait <- data.complete %>% 
+  ungroup() %>% 
+  dplyr::select(species,WD) %>% 
+  unique() %>% 
+  remove_rownames() %>% column_to_rownames(var = "species")
+
+shiny::runApp("R/shiny.R")
+
 # testing all functions ------
 data.correct.for.zombie <- correct.zombie (data = data.complete)
 data.correct.dbh.10cm.census1_2 <- correct.diameter (data = data.correct.for.zombie, 
@@ -92,12 +100,6 @@ forest.dynamics <- demography.and.dynamics(survival = survival.carbon,
                                            recruitment = recruitment.carbon,
                                            mortality = mortality.carbon,
                                            metric = "carbon")
-
-trait <- data.complete %>% 
-  ungroup() %>% 
-  dplyr::select(species,WD) %>% 
-  unique() %>% 
-  remove_rownames() %>% column_to_rownames(var = "species")
 
 all.diversity.metrics <- all.diversity (survival = survival.vital,
                                         recruitment = recruitment.vital,
