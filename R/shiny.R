@@ -3,10 +3,10 @@ library(zip)
 
 ui <- fluidPage(tags$head(
   tags$style(HTML("
-      /* Estilo para melhor visualização em tela cheia */
-      .container-fluid { max-width: 1200px; margin: auto; }
-      .data-table-container { max-height: 400px; overflow-y: auto; }
-    "))),
+    body { background-color: azure; }
+    .well { background-color: azure2; border: 1px solid grey70; }
+    .btn { background-color: azure2; border-color: grey70; }
+  "))),
   titlePanel("App para obter estimativas de estrutura e dinâmica florestal - LERSAF (UFRGS)"),
   sidebarLayout(
     sidebarPanel(
