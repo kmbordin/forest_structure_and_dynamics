@@ -88,7 +88,7 @@ server <- function(input, output) {
       
       return(result)
     } ,
-    correct.diameter = function (data,census.numb,dbh){
+    correct.diameter = function (data,census.numb,dbh, WD.info, H.info){
       
       #' @description correct diameter to avoid abnormal growth rates
       #' @author Kauane Maiara Bordin (kauanembordin[at]gmail.com)
@@ -206,29 +206,69 @@ server <- function(input, output) {
         pivot_wider(id_cols = NULL,names_from = census.n ,values_from = census.yr) %>% 
         rename(census.number1 = `1`,
                census.number2 = `2`)
-      
-      #summarise species information
+      if(H.info==TRUE){
       overall.height.mean <- mean(data$Height, na.rm = TRUE)
       non_na_heights <- data$Height[!is.na(data$Height)]
       
       if (length(non_na_heights) > 0) {
         overall.height.mean <- mean(non_na_heights)
       } else {
-        overall.height.mean <- NA 
+        overall.height.mean <- NA }
       }
-      
-      data.summarised3 <- data %>% 
+      #summarise species information
+
+      if(H.info==FALSE){
+        data <- data %>% 
+        mutate(Height = NA)
+      }
+      if(WD.info==TRUE){
+        data <- data
+      }
+      if(WD.info==FALSE){
+        data <- data %>% 
+          mutate(WD = NA)
+      }
+
+      if(WD.info==TRUE & H.info==TRUE){
+        data.summarised3 <- data %>% 
+          ungroup() %>% 
+          dplyr::select(species,family,genus,WD,Height,treeid,census.n) %>% 
+          ungroup() %>% 
+          group_by(species) %>%
+          mutate(WD = coalesce(WD, unique(WD[!is.na(WD)]))) %>% # includes the WD of former zombie tree
+          ungroup() %>% 
+          group_by(treeid) %>%
+          mutate(Height1 = (mean(Height, na.rm = TRUE))) %>% # includes the mean height of former zombie tree
+          mutate(Height = coalesce(Height1,overall.height.mean),
+                 census.n = as.numeric(census.n)) %>% 
+          unique()
+      }
+      if(WD.info==TRUE & H.info==FALSE){
+        data.summarised3 <- data %>% 
+          ungroup() %>% 
+          dplyr::select(species,family,genus,WD,Height,treeid,census.n) %>% 
+          ungroup() %>% 
+          group_by(species) %>%
+          mutate(WD = coalesce(WD, unique(WD[!is.na(WD)]))) %>% # includes the WD of former zombie tree
+          ungroup() 
+      }
+      if(WD.info==FALSE & H.info==TRUE){
+        data.summarised3 <- data %>% 
+          ungroup() %>% 
+          dplyr::select(species,family,genus,WD,Height,treeid,census.n) %>% 
+          ungroup() %>% 
+          group_by(treeid) %>%
+          mutate(Height1 = (mean(Height, na.rm = TRUE))) %>% # includes the mean height of former zombie tree
+          mutate(Height = coalesce(Height1,overall.height.mean),
+                 census.n = as.numeric(census.n)) %>% 
+          unique()
+      }
+      if(WD.info==FALSE & H.info==FALSE) {
+        data.summarised3 <- data %>% 
         ungroup() %>% 
         dplyr::select(species,family,genus,WD,Height,treeid,census.n) %>% 
-        ungroup() %>% 
-        group_by(species) %>%
-        mutate(WD = coalesce(WD, unique(WD[!is.na(WD)]))) %>% # includes the WD of former zombie tree
-        ungroup() %>% 
-        group_by(treeid) %>%
-        mutate(Height1 = (mean(Height, na.rm = TRUE))) %>% # includes the mean height of former zombie tree
-        mutate(Height = coalesce(Height1,overall.height.mean),
-               census.n = as.numeric(census.n)) %>% 
         unique()
+      }
       
       # the following code effectively corrects for the dbh between census 
       # the corrections are applied to dbhs that present abnormal growth (negative or positive).
@@ -304,10 +344,11 @@ server <- function(input, output) {
       }
       
       if(WD.info==FALSE){  #get wood density values for species from Zanne et al 2014
+        data <- data %>% dplyr::select(-WD)
         WD <- BIOMASS::getWoodDensity(data$genus, data$species) %>% 
           dplyr::select(species,meanWD,levelWD) %>% 
           rename(WD = meanWD) %>% 
-          unique()
+          distinct(species, .keep_all = TRUE)
       }
       
       if(H.info==TRUE){
@@ -317,6 +358,7 @@ server <- function(input, output) {
       
       if(H.info==FALSE){  #get wood density values for species from Zanne et al 2014
         H <- data %>% 
+          ungroup() %>% 
           dplyr::select(longitude,latitude)
       }
       
@@ -334,22 +376,24 @@ server <- function(input, output) {
       if(H.info==FALSE & WD.info==TRUE){
         WD <- unique(WD)
         data.c <- left_join(data,WD, by="species") %>% 
-          mutate(WD = WD.x)
+          mutate(WD = WD.x)%>% 
+          dplyr::select(-Height)
         biomass  <-  BIOMASS::computeAGB(D = data.c$d, WD = data.c$WD, coord = H)
         biomass <- data.frame(AGB = biomass) %>% 
           dplyr::mutate(AGC = AGB*0.456)  #estimate AGC based on Martin et al 2018
       }
       
       if(H.info==FALSE & WD.info==FALSE){
-        WD <- unique(WD)
-        data.c <- left_join(data,WD, by="species") 
+        WD <- WD %>% dplyr::select (species,WD) 
+        data.c <- left_join(data,WD, by="species") %>% 
+          dplyr::select(-Height)
         biomass  <-  BIOMASS::computeAGB(D = data.c$d, WD = data.c$WD, coord = H)
         biomass <- data.frame(AGB = biomass) %>% 
           dplyr::mutate(AGC = AGB*0.456)  #estimate AGC based on Martin et al 2018
       }
       
       if(H.info==TRUE & WD.info==FALSE){
-        WD <- unique(WD)
+        WD <- WD %>% dplyr::select (species,WD) 
         data.c <- left_join(data,WD, by="species") 
         biomass  <-  BIOMASS::computeAGB(D = data.c$d, WD = data.c$WD, H = H$Height)
         biomass <- data.frame(AGB = biomass) %>% 
@@ -978,7 +1022,9 @@ server <- function(input, output) {
     # aplica f2 (correct.diameter) com parametro do input
     df <- minhas_funcoes$correct.diameter(df, 
                                           census.numb = input$census.numb,
-                                          dbh = input$dbh)
+                                          dbh = input$dbh,
+                                          WD.info = input$WD.info,
+                                          H.info = input$H.info)
     resultados[["correct.diameter"]] <- as.data.frame(df)
     
     
@@ -1034,7 +1080,7 @@ server <- function(input, output) {
     resultados[["functional_census2"]] <- as.data.frame(all.div$functional_census1)
     resultados[["comm.c1.density"]] <- as.data.frame(all.div$community_matrix_c1)
     resultados[["comm.c2.density"]] <- as.data.frame(all.div$community_matrix_c2)
-    resultados[["plotcodes"]] <- (all.div$taxonomic.diversity$plotcodes)
+    resultados[["plotcodes"]] <- as.data.frame(all.div$taxonomic.diversity$plotcode)
 
     
     return(resultados)
