@@ -13,15 +13,17 @@ ui <- fluidPage(tags$head(
       actionButton("run", "Rodar Funções"),
       br(), br(),
       downloadButton("download_zip", "Baixar Todos os Resultados + Funções (.zip)"),
-      selectInput("census.numb",label = "correct.census: census.number:",
-        choices = c("1_2", "2_3", "3_4", "4_5", "6_7"), selected = "1_2"),
+      selectInput("ontogeny",label = "ontogenetic stage",
+                  choices = c("juvenile", "adult","all"), selected = "adult"),
+      selectInput("census.n",label = "correct.census and demography: census.number:",
+        choices = c("1_2", "2_3", "3_4", "4_5", "6_7","7_8"), selected = "1_2"),
       numericInput("dbh", "correct.census and carbon estimates: dbh:", value = 10, min = 0),
       selectInput("WD.info",label = "carbon.estimation: WD.info:",
                   choices = c("TRUE", "FALSE"), selected = "TRUE"),
       selectInput("H.info",label = "carbon.estimation: H.info:",
                   choices = c("TRUE", "FALSE"), selected = "TRUE"),
-      selectInput("census.n",label = "demography: census.number:",
-                  choices = c("1_2", "2_3", "3_4", "4_5", "6_7","7_8"), selected = "1_2"),
+      #selectInput("census.n",label = "demography: census.number:",
+                  #choices = c("1_2", "2_3", "3_4", "4_5", "6_7","7_8"), selected = "1_2"),
       selectInput("metric",label = "demography: metric:",
                   choices = c("vital", "carbon"), selected = "vital")),
     mainPanel(
@@ -36,6 +38,20 @@ server <- function(input, output) {
   dados_iniciais <- data.complete
   trait.data <- trait
   minhas_funcoes <- list(
+    ontogeny = function(data, ontogeny){
+      if(ontogeny == "juvenile"){
+        data <- data %>% 
+          filter(d<5)
+      }
+      if(ontogeny == "adult"){
+        data <- data %>% 
+          filter(d>=5)
+      }
+        if(ontogeny == "all"){
+          data <- data
+        }
+      return(data)
+    },
     correct.zombie = function (data){
       
       #' @description generates correction for stems assigned as alive, dead, alive
@@ -88,7 +104,7 @@ server <- function(input, output) {
       
       return(result)
     } ,
-    correct.diameter = function (data,census.numb,dbh, WD.info, H.info){
+    correct.diameter = function (data,census.n,dbh, WD.info, H.info){
       
       #' @description correct diameter to avoid abnormal growth rates
       #' @author Kauane Maiara Bordin (kauanembordin[at]gmail.com)
@@ -105,15 +121,15 @@ server <- function(input, output) {
         filter(d >= dbh) %>%  # to ensure same dbh threshold for all stems. dbh must be in cm!
         filter(! family %in% ferns.families) # remove ferns families
       
-      original.census.n = census.numb # save original info
+      original.census.n = census.n # save original info
       
-      if(census.numb=="1_2") { # data filtering for census 1 and 2
+      if(census.n=="1_2") { # data filtering for census 1 and 2
         census1 = data %>% filter(census.n == 1)
         census2 = data %>% filter(census.n == 2)
         data = bind_rows(census1,census2)
       }
       
-      if(census.numb=="2_3"){ # data filtering for census 2 and 3
+      if(census.n=="2_3"){ # data filtering for census 2 and 3
         #census1
         census1 = data %>% filter(census.n == 2) %>% 
           mutate(census.n = replace(census.n, census.n == "2", "1")) 
@@ -126,7 +142,7 @@ server <- function(input, output) {
         data = bind_rows(census1,census2)
       }
       
-      if(census.numb=="3_4"){ # data filtering for census 3 and 4
+      if(census.n=="3_4"){ # data filtering for census 3 and 4
         #census1
         census1 = data %>% filter(census.n == 3) %>% 
           mutate(census.n = replace(census.n, census.n == "3", "1")) 
@@ -139,7 +155,7 @@ server <- function(input, output) {
         data = bind_rows(census1,census2)
       }
       
-      if(census.numb=="4_5"){ # data filtering for census 4 and 5
+      if(census.n=="4_5"){ # data filtering for census 4 and 5
         #census1
         census1 = data %>% filter(census.n == 4) %>% 
           mutate(census.n = replace(census.n, census.n == "4", "1")) 
@@ -159,13 +175,25 @@ server <- function(input, output) {
         data = bind_rows(census1,census2)
       }
       
-      if(census.numb=="6_7"){ # data filtering for census 6 and 7
+      if(census.n=="6_7"){ # data filtering for census 6 and 7
         #census1
         census1 = data %>% filter(census.n == 6) %>% 
           mutate(census.n = replace(census.n, census.n == "6", "1")) 
         #census2
         census2 = data %>% filter(census.n == 7) %>% 
           mutate(census.n = replace(census.n, census.n == "7", "2")) 
+        c2 = unique(census2$plotcode)
+        census1 <- census1 %>% 
+          filter(plotcode %in% c2)
+        data = bind_rows(census1,census2)
+      }
+      if(census.n=="7_8"){ # data filtering for census 6 and 7
+        #census1
+        census1 = data %>% filter(census.n == 7) %>% 
+          mutate(census.n = replace(census.n, census.n == "7", "1")) 
+        #census2
+        census2 = data %>% filter(census.n == 8) %>% 
+          mutate(census.n = replace(census.n, census.n == "8", "2")) 
         c2 = unique(census2$plotcode)
         census1 <- census1 %>% 
           filter(plotcode %in% c2)
@@ -988,6 +1016,12 @@ server <- function(input, output) {
       
       comm1 <- as.matrix(comm.c1.density)
       comm2 <- as.matrix(comm.c2.density)
+      comm.c1.density <- comm.c1.density %>% 
+        mutate(plotcode = rownames(comm.c1.density)) %>% 
+        relocate(plotcode)
+      comm.c2.density <- comm.c2.density %>% 
+        mutate(plotcode = rownames(comm.c1.density)) %>% 
+        relocate(plotcode)
       
       functionalcensus1 <- dbFD(x = trait1, a = comm1)
       print("functional metrics from census 1 successfully obtained")
@@ -995,8 +1029,10 @@ server <- function(input, output) {
       functionalcensus2 <- dbFD(x = trait2, a = comm2)
       print("functional metrics from census 2 successfully obtained")
       
+      plotcodes = data.frame(plotcodes = diversity.density$plotcode)
+      
       estimates <- list(taxonomic.diversity = diversity.density, 
-                        plotcodes = diversity.density$plotcode,
+                        plotcodes = plotcodes,
                         functional_census1 = functionalcensus1,
                         functional_census2 = functionalcensus2,
                         community_matrix_c1 = comm.c1.density,
@@ -1015,13 +1051,17 @@ server <- function(input, output) {
     trt <- trait.data
     resultados <- list("Planilha original" = df)
     
+    # aplica f0 (ontogeny)
+    df <- minhas_funcoes$ontogeny(df, ontogeny = input$ontogeny)
+    resultados[["ontogeny"]] <- as.data.frame(df)
+    
     # aplica f1 (correct.zombie)
     df <- minhas_funcoes$correct.zombie(df)
     resultados[["correct.zombie"]] <- as.data.frame(df)
     
     # aplica f2 (correct.diameter) com parametro do input
     df <- minhas_funcoes$correct.diameter(df, 
-                                          census.numb = input$census.numb,
+                                          census.n = input$census.n,
                                           dbh = input$dbh,
                                           WD.info = input$WD.info,
                                           H.info = input$H.info)
@@ -1080,7 +1120,7 @@ server <- function(input, output) {
     resultados[["functional_census2"]] <- as.data.frame(all.div$functional_census1)
     resultados[["comm.c1.density"]] <- as.data.frame(all.div$community_matrix_c1)
     resultados[["comm.c2.density"]] <- as.data.frame(all.div$community_matrix_c2)
-    resultados[["plotcodes"]] <- as.data.frame(all.div$taxonomic.diversity$plotcode)
+    resultados[["plotcodes"]] <- as.data.frame(all.div$plotcodes)
 
     
     return(resultados)
