@@ -161,6 +161,12 @@ all.diversity <- function (survival,mortality,recruitment,trait){
   comm1 <- as.matrix(comm.c1.density)
   comm2 <- as.matrix(comm.c2.density)
   
+  comm.c1.density <- comm.c1.density %>% 
+    mutate(plotcode = rownames(comm.c1.density)) %>% 
+    relocate(plotcode)
+  comm.c2.density <- comm.c2.density %>% 
+    mutate(plotcode = rownames(comm.c1.density)) %>% 
+    relocate(plotcode)
 
   functionalcensus1 <- dbFD(x = trait1, a = comm1)
   print("functional metrics from census 1 successfully obtained")
