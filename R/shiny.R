@@ -796,8 +796,8 @@ server <- function(input, output) {
                                                 plotcode = time$plotcode,
                                                 gains = all.carbon.gains.c2$gains, # survivors' growth + recruitment
                                                 incr.surv = surv.agc$surv.agc_gain.ha.yr, # survivors' growth per ha/yr
-                                                basal.area.total$basal.area_c1,
-                                                basal.area.total$basal.area_c2) %>% 
+                                                basal.area.c1 = basal.area.total$basal.area_c1,
+                                                basal.area.c2 = basal.area.total$basal.area_c2) %>% 
           left_join(mort.agc.total.ha) %>% 
           left_join(rec.agc_gain.ha.yr) %>%
           dplyr::rename(losses = mort.agc.total.ha,
