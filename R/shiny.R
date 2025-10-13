@@ -40,7 +40,8 @@ server <- function(input, output) {
   minhas_funcoes <- list(
     ontogeny = function(data, ontogeny){
       if(ontogeny == "juvenile"){
-        data <- data %>% 
+        data <- data %>%
+          filter(d>0) %>% 
           filter(d<5)
       }
       if(ontogeny == "adult"){

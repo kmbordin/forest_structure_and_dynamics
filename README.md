@@ -49,8 +49,8 @@ data.complete <- data.frame(
 mutate(census.n = ifelse(census.yr %in% c(2000,2005),1,NA),
       census.n = ifelse(census.yr %in% c(2010,2020),2,census.n),
       census.n = ifelse(census.yr %in% c(2024),3,census.n), 
-      Height = c(12,10,3,4,5,6,7,8,9,10,11,5,13,7,15,16,17,10,19,20,3,22,12,10,12),
-      WD = c(0.47,0.81,0.47,0.81,0.47,0.81,0.87,0.87,0.87,0.40, 0.62,0.72,0.40,0.62,0,0.81,0.81,0.81,0.81,0.81,0.81,0.81,0.62,0.47,0.62))
+  Height = c(12,10,3,4,5,6,7,8,9,10,11,5,13,7,15,16,17,10,19,20,3,22,12,10,12),
+  WD = c(0.47,0.81,0.47,0.81,0.47,0.81,0.87,0.87,0.87,0.40, 0.62,0.72,0.40,0.62,0,0.81,0.81,0.81,0.81,0.81,0.81,0.81,0.62,0.47,0.62))
 
 ```
 
@@ -89,7 +89,7 @@ Description: Sometimes long-term monitoring fails in tracking stem diameter and 
 
 ## \# code 3: `carbon.est.R`
 
-Description: biomass (AGB) and carbon (AGC) estimates using data for different sources. In this code we can obtain AGB and AGC using refined data of WD and individual height but also WD from global databases (Zanne et al 2014) and *E* parameter (environmental stress). The parameters allow to use both sources as well - local WD and E, or WD from databases and individual height. It is strongly advised to run `correct.diameter.R` function before to correct for any inconsistencies in dbh measurement.
+Description: biomass (AGB) and carbon (AGC) estimates using data from different sources. In this code we can obtain AGB and AGC using refined data of WD and individual height but also WD from global databases (Zanne et al 2014) and *E* parameter (environmental stress). The parameters allow to use both sources as well - local WD and E, or WD from databases and individual height. It is strongly advised to run `correct.diameter.R` function before to correct for any inconsistencies in dbh measurement.
 
 The equation used to estimate biomass refers to the equation by Chave et al. 2014 (doi.org/10.1111/gcb.12629), which uses information on diameter, wood density, and an environmental stress component *E* (or individual height). From the information on species identity and location (latitude and longitude) we obtain wood density and *E*, respectivelly. The estimated value is in biomass (AGB, in Mg), which is converted to carbon (AGC, in Mg) using the conversion factor 0.456, indicated in Martin et al. 2018 (doi.org/10.1111/gcb.12629).
 
@@ -199,4 +199,4 @@ If you find **any** inconsistency in the codes **please** contact kauanembordin[
 
 Most recent news! I have been playing to develop a shiny.app to run these codes quick and easily. It is a very (*very)* simple version, but it is working for the default parameters so far. I will keep updating it when I have some spare time :)
 
-In the shiny app there is an extra parameter `ontogeny`, where: juvenile == \>5cm dbh; adult == \>=5cm dbh; and all == all dbhs in the data.frame.
+In the shiny app there is an extra parameter `ontogeny`, where: juvenile == \<5cm dbh; adult == \>=5cm dbh; and all == all dbhs in the data.frame.
