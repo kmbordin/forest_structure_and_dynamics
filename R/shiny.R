@@ -14,7 +14,7 @@ ui <- fluidPage(tags$head(
       br(), br(),
       downloadButton("download_zip", "Baixar Todos os Resultados + Funções (.zip)"),
       selectInput("ontogeny",label = "ontogenetic stage",
-                  choices = c("juvenile", "adult","all"), selected = "adult"),
+                  choices = c("juvenile", "adult","all"), selected = "all"),
       selectInput("census.n",label = "correct.census and demography: census.number:",
         choices = c("1_2", "2_3", "3_4", "4_5", "6_7","7_8"), selected = "1_2"),
       numericInput("dbh", "correct.census and carbon estimates: dbh:", value = 10, min = 0),
@@ -214,7 +214,7 @@ server <- function(input, output) {
                     names_prefix = "census",
                     values_fn = list(census.yr = list)) %>%  
         unnest(cols = everything()) %>%  
-        select(-row_id) %>%  # remove id of duplicates
+        dplyr::select(-row_id) %>%  # remove id of duplicates
         unique() %>% 
         drop_na() %>% 
         mutate(census.interv = census2-census1) %>% # calculate census interval in years

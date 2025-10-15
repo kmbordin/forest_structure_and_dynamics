@@ -127,7 +127,7 @@ correct.diameter <- function (data,census.numb,dbh){
                 names_prefix = "census",
                 values_fn = list(census.yr = list)) %>%  
     unnest(cols = everything()) %>%  
-    select(-row_id) %>%  # remove id of duplicates
+    dplyr::select(-row_id) %>%  # remove id of duplicates
     unique() %>% 
     drop_na() %>% 
     mutate(census.interv = census2-census1) %>% # calculate census interval in years
