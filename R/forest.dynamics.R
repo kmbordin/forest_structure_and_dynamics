@@ -1,7 +1,7 @@
 ############################################################
 ########  DEMOGRAPHIC RATES AND FOREST DYNAMICS  ###########
 ############################################################
-### Code updated by Kauane M Bordin at 02 Oct 2025
+### Code updated by Kauane M Bordin at 24 Oct 2025
 
 ### Description: demographic rates (recruitment, mortality, turnover, individual-based)
 # and forest dynamics (carbon productivity and losses, stem-based) 
@@ -176,8 +176,17 @@ demography.and.dynamics <- function (survival,mortality,recruitment,metric){
       mutate(basal.area_c1 = (ba.surv.t1 + ba.mort),
              basal.area_c2 = (ba.surv.t2 + ba.rec))
     
+    # proportion of large trees
+    surv_c2
+    large.trees <- surv_c2 %>% 
+      group_by(plotcode) %>% 
+      summarise(n = n(),
+                large30 = sum(d >= 30),
+                prop.large = large30/n)
+    
     #final carbon tables ------
-    carbon_estimates_per_plot <- data.frame(Bs0 = surv.agc$Bs0,
+    carbon_estimates_per_plot <- data.frame(prop.large = large.trees$prop.large,
+                                            Bs0 = surv.agc$Bs0,
                                             B0 = all.carbon.c1$B0,
                                             Bt = all.carbon.c2$Bt,
                                             t = time$time.interv,

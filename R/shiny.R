@@ -787,9 +787,17 @@ server <- function(input, output) {
           dplyr::select(plotcode, ba.surv.t1,ba.surv.t2,ba.mort,ba.rec) %>% 
           mutate(basal.area_c1 = (ba.surv.t1 + ba.mort),
                  basal.area_c2 = (ba.surv.t2 + ba.rec))
+        # proportion of large trees
+        surv_c2
+        large.trees <- surv_c2 %>% 
+          group_by(plotcode) %>% 
+          summarise(n = n(),
+                    large30 = sum(d >= 30),
+                    prop.large = large30/n)
         
         #final carbon tables ------
-        carbon_estimates_per_plot <- data.frame(Bs0 = surv.agc$Bs0,
+        carbon_estimates_per_plot <- data.frame(prop.large = large.trees$prop.large,
+                                                Bs0 = surv.agc$Bs0,
                                                 B0 = all.carbon.c1$B0,
                                                 Bt = all.carbon.c2$Bt,
                                                 t = time$time.interv,
