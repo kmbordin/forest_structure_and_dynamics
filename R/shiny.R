@@ -640,9 +640,9 @@ server <- function(input, output) {
       #' recruitment: derived from demography function
       #' metric: "vital" or "carbon"
       
-      # function to calculate basal area in cm2/ha
-      basal.area<- function(x) { # x is dbh in cm
-        (pi*(x/2)^2)/10000} #to cm2/ha
+      # function to calculate basal area in m2/ha
+      basal.area<- function(dbh,plot.area) { # dbh in cm, plot.area in square meters
+        ((pi*(dbh/100)^2)/4)*(1/(plot.area)) } #to m2/ha
       
       mort <- mortality
       rec <- recruitment
@@ -672,7 +672,7 @@ server <- function(input, output) {
           mutate(mort.agc.total.ha = AGC/plot.area, # stem AGCmort per hectare
                  mort.agc.total.ha.yr = mort.agc.total.ha/time.interv, # stem AGCmort per hectare per year
                  status = as.numeric(status), # might be 0
-                 ba = basal.area(d)) # calculate basal area
+                 ba = basal.area(d,plot.area)) # calculate basal area
         
         # plot-level AGC and basal area per ha of dead stems in census2
         # it is based on AGC in census 1, when the stems were alive
@@ -688,7 +688,7 @@ server <- function(input, output) {
           mutate(rec.agc.total.ha = AGC/plot.area, # stem AGCrec per hectare
                  rec.agc.total.ha.yr = rec.agc.total.ha/time.interv, # stem AGCrec per hectare per year
                  status = as.numeric(status), #might be 1
-                 ba = basal.area(d)) # calculate basal area
+                 ba = basal.area(d,plot.area)) # calculate basal area
         
         # plot-level AGC and basal area per ha/year of recruited stems in census2
         # it is based on AGC in census 2, when the stems were alive
@@ -707,7 +707,7 @@ server <- function(input, output) {
         # summarising survival data ------
         surv <- surv %>% 
           mutate(status = as.numeric(status), # might be 1
-                 ba = basal.area(d))
+                 ba = basal.area(d,plot.area))
         
         #filter census1 and order treeid
         surv_c1 = surv %>% filter(census.n == 1) %>% arrange(treeid)
@@ -793,15 +793,16 @@ server <- function(input, output) {
           group_by(plotcode) %>% 
           summarise(n = n(),
                     large30 = sum(d >= 30),
-                    prop.large = large30/n)
+                    prop.large = (large30/n)*100)
         
         #final carbon tables ------
-        carbon_estimates_per_plot <- data.frame(prop.large = large.trees$prop.large,
-                                                Bs0 = surv.agc$Bs0,
+        carbon_estimates_per_plot <- data.frame(Bs0 = surv.agc$Bs0,
                                                 B0 = all.carbon.c1$B0,
                                                 Bt = all.carbon.c2$Bt,
                                                 t = time$time.interv,
                                                 plotcode = time$plotcode,
+                                                prop.large = large.trees$prop.large,
+                                                n.stems.c2 = large.trees$n,
                                                 gains = all.carbon.gains.c2$gains, # survivors' growth + recruitment
                                                 incr.surv = surv.agc$surv.agc_gain.ha.yr, # survivors' growth per ha/yr
                                                 basal.area.c1 = basal.area.total$basal.area_c1,
