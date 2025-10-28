@@ -138,13 +138,22 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session) {
+  options(shiny.maxRequestSize = 30 * 1024^2)
+  # Carregar pacotes automaticamente
+  required_packages <- c("tidyverse", "BIOMASS", "vegan", "FD", "hillR", "zip")
   
-  # Reactive para dados das parcelas (plot data)
+  for (pkg in required_packages) {
+    if (!require(pkg, character.only = TRUE, quietly = TRUE)) {
+      showNotification(paste("Installing package:", pkg), type = "message")
+      install.packages(pkg, dependencies = TRUE, quiet = TRUE)
+      library(pkg, character.only = TRUE)
+    }
+  }
   dados_parcelas <- reactive({
-    if (!is.null(input$file_upload)) {
-      # Se fez upload, usa os dados carregados
-      req(input$file_upload)
-      df <- read.csv(input$file_upload$datapath)
+    # Se fez upload, usa apenas os dados carregados
+    if (!is.null(input$file_upload_plots)) {
+      req(input$file_upload_plots)
+      df <- read.csv(input$file_upload_plots$datapath)
       
       # Verifica colunas obrigatórias
       colunas_obrigatorias <- c("plotcode", "census.n", "treeid", "species", "d")
@@ -154,8 +163,13 @@ server <- function(input, output, session) {
       }
       return(df)
     } else {
-      # Se não fez upload, usa dados do environment
-      return(data.complete)
+      # Só tenta usar data.complete se não fez upload
+      if (exists("data.complete")) {
+        return(data.complete)
+      } else {
+        showNotification("Please upload a data file", type = "warning")
+        return(NULL)
+      }
     }
   })
   
