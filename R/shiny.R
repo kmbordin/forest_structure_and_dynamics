@@ -39,7 +39,6 @@ ui <- fluidPage(
         p("This application provides tools for analysing forest structure, dynamics, and carbon estimates."),
         
         h3("📊 Available analyses:"),
-
         tags$ul(
           tags$li(strong("Correct zombie trees")),
           tags$li(strong("Diameter correction")),
@@ -47,9 +46,11 @@ ui <- fluidPage(
           tags$li(strong("Demographic analysis")),
           tags$li(strong("Forest dynamics"))
         ),
-        a("Documentation - README file", 
-          href = "https://github.com/kmbordin/forest_structure_and_dynamics/blob/main/README.md", 
-          target = "_blank")),
+        
+        p("📖 ", 
+          a("Documentation - README file", 
+            href = "https://github.com/kmbordin/forest_structure_and_dynamics/blob/main/README.md", 
+            target = "_blank")),
         
         h3("🎯 How to use:"),
         tags$ol(
@@ -60,13 +61,10 @@ ui <- fluidPage(
         ),
         
         h3("📁 Data requirements:"),
-        p("📖 ", 
-
         p("Your data should be in ForestPlots.net format with the following columns:"),
         tags$code("plotcode, plot.area, census.yr, treeid, stem.gr.id, species, d, genus, family, latitude, longitude, Height, WD"),
         
         h3("Support and Contact:"),
-        
         p("📧 ", tags$strong("kauanembordin@gmail.com")),
         p("🌐 ", 
           a("GitHub Repository", 
@@ -75,21 +73,34 @@ ui <- fluidPage(
         
         p(tags$small("MIT License © 2025")),
         br(), br()
-        
       )
     ),
     
-    # ABA 2: ANÁLISE (seu código original)
+    # ABA 2: ANÁLISE
     tabPanel(
-      "Analysis",
+      "Analyses",
       icon = icon("chart-bar"),
       sidebarLayout(
         sidebarPanel(
+          # Upload de dados das parcelas
+          fileInput("file_upload_plots", "Upload your plot data (.csv)",
+                    accept = c(".csv"),
+                    buttonLabel = "Browse...",
+                    placeholder = "No file selected"),
+          
+          # Upload de dados de traits
+          fileInput("file_upload_traits", "Upload your trait data (.csv)",
+                    accept = c(".csv"),
+                    buttonLabel = "Browse...",
+                    placeholder = "No file selected"),
+          # Parâmetros de análise
           actionButton("run", "Run analysis", 
                        class = "btn-success btn-block",
                        icon = icon("play")),
           br(), br(),
-          downloadButton("download_zip", "Download all results and codes (.zip)"),
+          downloadButton("download_zip", "Download all results and codes (.zip)",
+                         class = "btn-download btn-primary"),
+          
           selectInput("ontogeny",label = "ontogenetic stage",
                       choices = c("juvenile", "adult","all"), selected = "all"),
           selectInput("census.n",label = "correct.census and demography: census.number:",
@@ -126,13 +137,46 @@ ui <- fluidPage(
   )
 )
 
-server <- function(input, output) {
-  observeEvent(input$go_to_analysis, {
-    updateTabsetPanel(session, "main_tabs", selected = "Analysis")
+server <- function(input, output, session) {
+  
+  # Reactive para dados das parcelas (plot data)
+  dados_parcelas <- reactive({
+    if (!is.null(input$file_upload)) {
+      # Se fez upload, usa os dados carregados
+      req(input$file_upload)
+      df <- read.csv(input$file_upload$datapath)
+      
+      # Verifica colunas obrigatórias
+      colunas_obrigatorias <- c("plotcode", "census.n", "treeid", "species", "d")
+      if(!all(colunas_obrigatorias %in% names(df))) {
+        showNotification("Error: Missing required columns in plot data", type = "error")
+        return(NULL)
+      }
+      return(df)
+    } else {
+      # Se não fez upload, usa dados do environment
+      return(data.complete)
+    }
   })
-  # Dataset de exemplo
-  dados_iniciais <- data.complete
-  trait.data <- trait
+  
+  # Reactive para dados de traits (trait data)
+  dados_traits <- reactive({
+    if (!is.null(input$file_upload_traits)) {
+      # Se fez upload de traits, usa os dados carregados
+      req(input$file_upload_traits)
+      traits_df <- read.csv(input$file_upload_traits$datapath)
+      return(traits_df)
+    } else {
+      # Se não fez upload, usa traits do environment (se existir)
+      if (exists("trait")) {
+        return(trait)
+      } else {
+        return(NULL)
+      }
+    }
+  })
+
+  
   minhas_funcoes <- list(
     ontogeny = function(data, ontogeny){
       if(ontogeny == "juvenile"){
@@ -1151,10 +1195,9 @@ server <- function(input, output) {
    
   # Roda o pipeline e guarda todos os resultados
   resultados_pipeline <- eventReactive(input$run, {
-    # Simula o dataset original que deve estar disponível no ambiente Shiny
-    # Aqui, você usaria o seu data.complete real.
-    df <- dados_iniciais
-    trt <- trait.data
+    # Use os reactives em vez das variáveis fixas
+    df <- dados_parcelas()      # ← em vez de dados_iniciais
+    traits <- dados_traits()    # ← em vez de trait.data
     resultados <- list("original dataset" = df)
     
     # aplica f0 (ontogeny)
@@ -1219,7 +1262,7 @@ server <- function(input, output) {
       survival = survival_corrigido,  # USA O SURVIVAL CORRIGIDO QUANDO metric=carbon
       mortality = demography_result$mortality, 
       recruitment = demography_result$recruitment,
-      trait = trt
+      trait = traits  
     )
     resultados[["taxonomic.diversity"]] <- as.data.frame(all.div$taxonomic.diversity)
     resultados[["functional_census1"]] <- as.data.frame(all.div$functional_census1)
