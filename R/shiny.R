@@ -1,36 +1,62 @@
 library(shiny)
 library(zip)
-
-ui <- fluidPage(tags$head(
-  tags$style(HTML("
-    body { background-color: azure; }
-    .well { background-color: azure2; border: 1px solid grey70; }
-    .btn { background-color: azure2; border-color: grey70; }
-  "))),
-  titlePanel("App para obter estimativas de estrutura e dinâmica florestal - LERSAF (UFRGS)"),
+ui <- fluidPage(
+  tags$head(
+    tags$style(HTML("
+      body { background-color: azure; }
+      .well { background-color: azure2; border: 1px solid grey70; }
+      .btn { background-color: azure2; border-color: grey70; }
+      .help-panel { 
+        background-color: white; 
+        padding: 15px; 
+        border-radius: 5px; 
+        border: 1px solid #007bff; 
+        margin-top: 20px;
+        font-size: 12px;
+      }
+    "))
+  ),
+  titlePanel("🌳🌴🌲 Forest structure and dynamics 🌳🌴🌲"),
   sidebarLayout(
     sidebarPanel(
-      actionButton("run", "Rodar Funções"),
+      actionButton("run", "Run analysis", 
+                   class = "btn-success btn-block",
+                   icon = icon("play")),
       br(), br(),
-      downloadButton("download_zip", "Baixar Todos os Resultados + Funções (.zip)"),
+      downloadButton("download_zip", "Download all results and codes (.zip)"),
       selectInput("ontogeny",label = "ontogenetic stage",
                   choices = c("juvenile", "adult","all"), selected = "all"),
       selectInput("census.n",label = "correct.census and demography: census.number:",
-        choices = c("1_2", "2_3", "3_4", "4_5", "6_7","7_8"), selected = "1_2"),
+                  choices = c("1_2", "2_3", "3_4", "4_5", "6_7","7_8"), selected = "1_2"),
       numericInput("dbh", "correct.census and carbon estimates: dbh:", value = 10, min = 0),
       selectInput("WD.info",label = "carbon.estimation: WD.info:",
                   choices = c("TRUE", "FALSE"), selected = "TRUE"),
       selectInput("H.info",label = "carbon.estimation: H.info:",
                   choices = c("TRUE", "FALSE"), selected = "TRUE"),
-      #selectInput("census.n",label = "demography: census.number:",
-                  #choices = c("1_2", "2_3", "3_4", "4_5", "6_7","7_8"), selected = "1_2"),
       selectInput("metric",label = "demography: metric:",
-                  choices = c("vital", "carbon"), selected = "vital")),
+                  choices = c("vital", "carbon"), selected = "vital"),
+      
+      # Caixa de ajuda no final do sidebar - CORRIGIDO
+      div(
+        class = "help-panel",
+        h4("Help & Support", style = "margin-top: 0;"),
+        p("📧 ", tags$strong("kauanembordin@gmail.com")),
+        p("🌐 ", 
+          a("GitHub Repository", 
+            href = "https://github.com/kmbordin/forest_structure_and_dynamics", 
+            target = "_blank")),
+        p("📖 ", 
+          a("Documentation", 
+            href = "https://github.com/kmbordin/forest_structure_and_dynamics/blob/main/README.md", 
+            target = "_blank")),
+        p(tags$small("MIT License © 2025"))
+      )
+    ),  # FIM do sidebarPanel
     mainPanel(
       uiOutput("resultados")
     )
-  )
-)
+  )  # FIM do sidebarLayout
+)  # FIM do fluidPage
 
 server <- function(input, output) {
   
@@ -1059,7 +1085,7 @@ server <- function(input, output) {
     # Aqui, você usaria o seu data.complete real.
     df <- dados_iniciais
     trt <- trait.data
-    resultados <- list("Planilha original" = df)
+    resultados <- list("original dataset" = df)
     
     # aplica f0 (ontogeny)
     df <- minhas_funcoes$ontogeny(df, ontogeny = input$ontogeny)
@@ -1197,7 +1223,7 @@ server <- function(input, output) {
     tabs <- lapply(names(res), function(nome) {
       tabPanel(
         nome,
-        downloadButton(paste0("download_", gsub("[^a-zA-Z0-9]", "_", nome)), "Baixar CSV"),
+        downloadButton(paste0("download_", gsub("[^a-zA-Z0-9]", "_", nome)), "Download .csv"),
         br(), br(),
         tableOutput(paste0("tbl_", gsub("[^a-zA-Z0-9]", "_", nome)))
       )
