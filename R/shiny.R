@@ -14,52 +14,122 @@ ui <- fluidPage(
         margin-top: 20px;
         font-size: 12px;
       }
+      .welcome-panel {
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        margin: 20px 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
     "))
   ),
+  
   titlePanel("🌳🌴🌲 Forest structure and dynamics 🌳🌴🌲"),
-  sidebarLayout(
-    sidebarPanel(
-      actionButton("run", "Run analysis", 
-                   class = "btn-success btn-block",
-                   icon = icon("play")),
-      br(), br(),
-      downloadButton("download_zip", "Download all results and codes (.zip)"),
-      selectInput("ontogeny",label = "ontogenetic stage",
-                  choices = c("juvenile", "adult","all"), selected = "all"),
-      selectInput("census.n",label = "correct.census and demography: census.number:",
-                  choices = c("1_2", "2_3", "3_4", "4_5", "6_7","7_8"), selected = "1_2"),
-      numericInput("dbh", "correct.census and carbon estimates: dbh:", value = 10, min = 0),
-      selectInput("WD.info",label = "carbon.estimation: WD.info:",
-                  choices = c("TRUE", "FALSE"), selected = "TRUE"),
-      selectInput("H.info",label = "carbon.estimation: H.info:",
-                  choices = c("TRUE", "FALSE"), selected = "TRUE"),
-      selectInput("metric",label = "demography: metric:",
-                  choices = c("vital", "carbon"), selected = "vital"),
-      
-      # Caixa de ajuda no final do sidebar - CORRIGIDO
+  
+  tabsetPanel(
+    id = "main_tabs",
+    
+    # ABA 1: PÁGINA INICIAL
+    tabPanel(
+      "Welcome",
+      icon = icon("home"),
       div(
-        class = "help-panel",
-        h4("Help & Support", style = "margin-top: 0;"),
+        class = "welcome-panel",
+        h2("Welcome to 🌳🌴🌲Forest Structure and Dynamics Analyses🌳🌴🌲", style = "color: #2E8B57;"),
+        p("This application provides tools for analysing forest structure, dynamics, and carbon estimates."),
+        
+        h3("📊 Available analyses:"),
+
+        tags$ul(
+          tags$li(strong("Correct zombie trees")),
+          tags$li(strong("Diameter correction")),
+          tags$li(strong("Carbon estimation")),
+          tags$li(strong("Demographic analysis")),
+          tags$li(strong("Forest dynamics"))
+        ),
+        a("Documentation - README file", 
+          href = "https://github.com/kmbordin/forest_structure_and_dynamics/blob/main/README.md", 
+          target = "_blank")),
+        
+        h3("🎯 How to use:"),
+        tags$ol(
+          tags$li("Go to the 'Analysis' tab"),
+          tags$li("Set your parameters in the sidebar"),
+          tags$li("Click 'Run analysis' to process your data"),
+          tags$li("Download results using the download button")
+        ),
+        
+        h3("📁 Data requirements:"),
+        p("📖 ", 
+
+        p("Your data should be in ForestPlots.net format with the following columns:"),
+        tags$code("plotcode, plot.area, census.yr, treeid, stem.gr.id, species, d, genus, family, latitude, longitude, Height, WD"),
+        
+        h3("Support and Contact:"),
+        
         p("📧 ", tags$strong("kauanembordin@gmail.com")),
         p("🌐 ", 
           a("GitHub Repository", 
             href = "https://github.com/kmbordin/forest_structure_and_dynamics", 
             target = "_blank")),
-        p("📖 ", 
-          a("Documentation", 
-            href = "https://github.com/kmbordin/forest_structure_and_dynamics/blob/main/README.md", 
-            target = "_blank")),
-        p(tags$small("MIT License © 2025"))
+        
+        p(tags$small("MIT License © 2025")),
+        br(), br()
+        
       )
-    ),  # FIM do sidebarPanel
-    mainPanel(
-      uiOutput("resultados")
+    ),
+    
+    # ABA 2: ANÁLISE (seu código original)
+    tabPanel(
+      "Analysis",
+      icon = icon("chart-bar"),
+      sidebarLayout(
+        sidebarPanel(
+          actionButton("run", "Run analysis", 
+                       class = "btn-success btn-block",
+                       icon = icon("play")),
+          br(), br(),
+          downloadButton("download_zip", "Download all results and codes (.zip)"),
+          selectInput("ontogeny",label = "ontogenetic stage",
+                      choices = c("juvenile", "adult","all"), selected = "all"),
+          selectInput("census.n",label = "correct.census and demography: census.number:",
+                      choices = c("1_2", "2_3", "3_4", "4_5", "6_7","7_8"), selected = "1_2"),
+          numericInput("dbh", "correct.census and carbon estimates: dbh:", value = 10, min = 0),
+          selectInput("WD.info",label = "carbon.estimation: WD.info:",
+                      choices = c("TRUE", "FALSE"), selected = "TRUE"),
+          selectInput("H.info",label = "carbon.estimation: H.info:",
+                      choices = c("TRUE", "FALSE"), selected = "TRUE"),
+          selectInput("metric",label = "demography: metric:",
+                      choices = c("vital", "carbon"), selected = "vital"),
+          
+          # Caixa de ajuda
+          div(
+            class = "help-panel",
+            h4("Help & Support", style = "margin-top: 0;"),
+            p("📧 ", tags$strong("kauanembordin@gmail.com")),
+            p("🌐 ", 
+              a("GitHub Repository", 
+                href = "https://github.com/kmbordin/forest_structure_and_dynamics", 
+                target = "_blank")),
+            p("📖 ", 
+              a("Documentation", 
+                href = "https://github.com/kmbordin/forest_structure_and_dynamics/blob/main/README.md", 
+                target = "_blank")),
+            p(tags$small("MIT License © 2025"))
+          )
+        ),
+        mainPanel(
+          uiOutput("resultados")
+        )
+      )
     )
-  )  # FIM do sidebarLayout
-)  # FIM do fluidPage
+  )
+)
 
 server <- function(input, output) {
-  
+  observeEvent(input$go_to_analysis, {
+    updateTabsetPanel(session, "main_tabs", selected = "Analysis")
+  })
   # Dataset de exemplo
   dados_iniciais <- data.complete
   trait.data <- trait
