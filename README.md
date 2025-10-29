@@ -1,6 +1,6 @@
 ---
 author: "Kauane Maiara Bordin"
-date: "2025-10-11"
+date: "2025-10-28"
 ---
 
 # Forest structure and dynamics: standard codes 🌳
@@ -118,10 +118,13 @@ Description: calculates demographic rates (recruitment, mortality, turnover, ind
  "B0" - AGC in census 1 (t0)
  "Bt" - AGC census 2 (t1)
  "t" - time census interval in years
+ "prop.large" - proportion of trees >= 30cm dbh
+ "n.stems.c2" - number of stems at census 2
+ "n.stems.c2.ha" - number of stems at census 2 per hectare
  "gains" - gains due to growth of survivors + recruits (Mg/ha)
  "incr.surv" - gains due to growth of survivors (Mg/ha/yr)
- "basal.area.total.basal.area_c1" - basal area (cm2/ha) in census 1
- "basal.area.total.basal.area_c2" - basal area (cm2/ha) in census 2
+ "basal.area.total.basal.area_c1" - basal area (m2/ha) in census 1
+ "basal.area.total.basal.area_c2" - basal area (m2/ha) in census 2
  "losses" - carbon losses due to mortality (Mg/ha/ano)
  "ba.mort" - basal area (cm2/ha) of dead stems
  "recruit.incr.ha.yr" - gains due to recrtuitment (Mg/ha/yr) 
@@ -140,11 +143,14 @@ Description: calculates demographic rates (recruitment, mortality, turnover, ind
  "Nt" - Final number of individuals in census 2 (t1)
  "Nst" - Number of surviving individuals in census 2 (t1)
  "t" - time census interval in years
- "N.stem.inicial" - Initial number of individuals in census 1 (t0)
- "N.stem.final" - Final number of individuals in census 2 (t1)
+ "plot.area" - plot area in hectares
+ "N.ind.inicial" - Initial number of individuals in census 1 (t0)
+ "N.ind.inicial" - Initial number of individuals in census 1 (t0) per hectare
+ "N.ind.final" - Final number of individuals in census 2 (t1)
+ "N.ind.final" - Final number of individuals in census 2 (t1) per hectare
  "ma" - mortality rates (%/yr) 
  "raf" - recruitment rates (%/yr)
- "turnover" - mean values between mortality and recruitment rates (yr)
+ "turnover" - mean values between mortality and recruitment rates (yr) 
 ```
 
 ## \# code 6: `all.diversity.R`
