@@ -145,9 +145,9 @@ Description: calculates demographic rates (recruitment, mortality, turnover, ind
  "t" - time census interval in years
  "plot.area" - plot area in hectares
  "N.ind.inicial" - Initial number of individuals in census 1 (t0)
- "N.ind.inicial" - Initial number of individuals in census 1 (t0) per hectare
+ "N.ind.inicial.ha" - Initial number of individuals in census 1 (t0) per hectare
  "N.ind.final" - Final number of individuals in census 2 (t1)
- "N.ind.final" - Final number of individuals in census 2 (t1) per hectare
+ "N.ind.final.ha" - Final number of individuals in census 2 (t1) per hectare
  "ma" - mortality rates (%/yr) 
  "raf" - recruitment rates (%/yr)
  "turnover" - mean values between mortality and recruitment rates (yr) 
