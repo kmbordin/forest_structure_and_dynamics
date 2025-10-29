@@ -679,12 +679,13 @@ server <- function(input, output, session) {
         total_census2 <- bind_rows(multi_census2, one_census2) %>% mutate(census.n = 2)
         plotarea <- census2 %>% 
           dplyr::select(plotcode,plot.area) %>% 
-          arrange(plotcode)
+          arrange(plotcode) %>% unique()
         
         full_data <- full_join(total_census1, total_census2) %>% 
           ungroup() %>% 
           left_join(plotarea, by="plotcode")
         data <- full_data
+        print(dim(data))
       }
       
       if(metric == "carbon") {
@@ -1010,6 +1011,7 @@ server <- function(input, output, session) {
           group_by(plotcode) %>%
           mutate(status = as.numeric(status)) %>% 
           summarise(Nst = sum(status)) 
+        print(head(surv.n.c2))
         
         # number of dead individuals in the second census
         mort.n.c2 <-  mort %>% group_by(plotcode) %>%
@@ -1028,11 +1030,13 @@ server <- function(input, output, session) {
                  status = as.numeric(status)) %>% 
           group_by(plotcode) %>%
           summarise(N0 = sum(status)) 
+        print(head(initial.number))
         
         # final number of individuals (Nt)
         final.number <- full_join(surv.n.c2,rec.n.c2) %>% 
           mutate(across(recruits, coalesce, 0)) %>% #in case there is zero recruitment
           mutate(Nt = (Nst)+(recruits))
+        print(head(final.number))
         
         plotarea <- surv %>% filter(census.n == 2) %>%
           dplyr::select(plotcode,plot.area) %>% 
@@ -1043,7 +1047,7 @@ server <- function(input, output, session) {
                                                  Nst = surv.n.c2$Nst,
                                                  t = time$time.interv,
                                                  plotcode = time$plotcode) %>% 
-          arrange(plotcode) %>% 
+          left_join(plotarea, by="plotcode") %>% 
           dplyr::mutate(N.ind.inicial = N0,
                         N.ind.inicial.ha = N0/plotarea$plot.area,
                         N.ind.final = Nt,
@@ -1052,10 +1056,9 @@ server <- function(input, output, session) {
                         raf = 1-((Nst/Nt)^(1/t)), 
                         turnover = (ma+raf)/2) %>% 
           relocate(plotcode, .before = N0)
-        
+        print(head(demographic_rates_per_plot))
         estimates <- demographic_rates_per_plot
       }
-      
       # retun data ----
       return(estimates)},
     all.diversity = function (survival,mortality,recruitment,trait){
