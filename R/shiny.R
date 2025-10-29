@@ -173,7 +173,6 @@ server <- function(input, output, session) {
     }
   })
   
-  # Reactive para dados de traits (trait data)
   dados_traits <- reactive({
     if (!is.null(input$file_upload_traits)) {
       # Se fez upload de traits, usa os dados carregados
@@ -678,7 +677,14 @@ server <- function(input, output, session) {
           mutate(treeid = as.character(treeid), n.stems = 1)
         
         total_census2 <- bind_rows(multi_census2, one_census2) %>% mutate(census.n = 2)
-        data <- full_join(total_census1, total_census2)
+        plotarea <- census2 %>% 
+          dplyr::select(plotcode,plot.area) %>% 
+          arrange(plotcode)
+        
+        full_data <- full_join(total_census1, total_census2) %>% 
+          ungroup() %>% 
+          left_join(plotarea, by="plotcode")
+        data <- full_data
       }
       
       if(metric == "carbon") {
@@ -940,14 +946,21 @@ server <- function(input, output, session) {
           mutate(across(where(is.numeric), tidyr::replace_na, 0)) %>% #in case there is na
           dplyr::select(plotcode, ba.surv.t1,ba.surv.t2,ba.mort,ba.rec) %>% 
           mutate(basal.area_c1 = (ba.surv.t1 + ba.mort),
-                 basal.area_c2 = (ba.surv.t2 + ba.rec))
+                 basal.area_c2 = (ba.surv.t2 + ba.rec)) %>% 
+          arrange(plotcode)
+        
         # proportion of large trees
         surv_c2
+        plotarea <- surv_c2 %>% dplyr::select(plotcode,plot.area) %>% 
+          unique() %>% arrange(plotcode)
         large.trees <- surv_c2 %>% 
+          bind_rows(rec) %>% 
           group_by(plotcode) %>% 
           summarise(n = n(),
                     large30 = sum(d >= 30),
-                    prop.large = (large30/n)*100)
+                    prop.large = (large30/n)*100) %>% 
+          arrange(plotcode) %>% 
+          mutate(n.ha = n/plotarea$plot.area)
         
         #final carbon tables ------
         carbon_estimates_per_plot <- data.frame(Bs0 = surv.agc$Bs0,
@@ -957,10 +970,11 @@ server <- function(input, output, session) {
                                                 plotcode = time$plotcode,
                                                 prop.large = large.trees$prop.large,
                                                 n.stems.c2 = large.trees$n,
+                                                n.stems.c2.ha = large.trees$n.ha,
                                                 gains = all.carbon.gains.c2$gains, # survivors' growth + recruitment
                                                 incr.surv = surv.agc$surv.agc_gain.ha.yr, # survivors' growth per ha/yr
-                                                basal.area.c1 = basal.area.total$basal.area_c1,
-                                                basal.area.c2 = basal.area.total$basal.area_c2) %>% 
+                                                basal.area.total$basal.area_c1,
+                                                basal.area.total$basal.area_c2) %>% 
           left_join(mort.agc.total.ha) %>% 
           left_join(rec.agc_gain.ha.yr) %>%
           dplyr::rename(losses = mort.agc.total.ha,
@@ -1020,13 +1034,20 @@ server <- function(input, output, session) {
           mutate(across(recruits, coalesce, 0)) %>% #in case there is zero recruitment
           mutate(Nt = (Nst)+(recruits))
         
+        plotarea <- surv %>% filter(census.n == 2) %>%
+          dplyr::select(plotcode,plot.area) %>% 
+          unique() %>% arrange(plotcode)
+        
         demographic_rates_per_plot <- data.frame(N0 = initial.number$N0,
                                                  Nt = final.number$Nt,
                                                  Nst = surv.n.c2$Nst,
                                                  t = time$time.interv,
                                                  plotcode = time$plotcode) %>% 
+          arrange(plotcode) %>% 
           dplyr::mutate(N.ind.inicial = N0,
+                        N.ind.inicial.ha = N0/plotarea$plot.area,
                         N.ind.final = Nt,
+                        N.ind.final.ha = Nt/plotarea$plot.area,
                         ma = 1-((Nst/N0)^(1/t)),
                         raf = 1-((Nst/Nt)^(1/t)), 
                         turnover = (ma+raf)/2) %>% 
@@ -1036,7 +1057,7 @@ server <- function(input, output, session) {
       }
       
       # retun data ----
-      return(estimates) },
+      return(estimates)},
     all.diversity = function (survival,mortality,recruitment,trait){
       
       #' @description generate data for demographic rates and forest dynamics

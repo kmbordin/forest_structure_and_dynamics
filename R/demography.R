@@ -201,8 +201,13 @@ demography <- function (data,metric,rate,census.n){
     total_census2 <- bind_rows(multi_census2, one_census2) %>% 
       mutate(census.n=2)
     
-    full_data <- full_join(total_census1, total_census2)
-    data <- full_data
+    plotarea <- census2 %>% 
+      dplyr::select(plotcode,plot.area) %>% 
+      arrange(plotcode) %>% unique()
+    
+    full_data <- full_join(total_census1, total_census2) %>% 
+      ungroup() %>% 
+      left_join(plotarea, by="plotcode")
     
     print("In case of the warning 
       'Caused by warning in `max()`[...]'
