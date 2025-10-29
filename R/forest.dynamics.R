@@ -174,15 +174,21 @@ demography.and.dynamics <- function (survival,mortality,recruitment,metric){
       mutate(across(where(is.numeric), tidyr::replace_na, 0)) %>% #in case there is na
       dplyr::select(plotcode, ba.surv.t1,ba.surv.t2,ba.mort,ba.rec) %>% 
       mutate(basal.area_c1 = (ba.surv.t1 + ba.mort),
-             basal.area_c2 = (ba.surv.t2 + ba.rec))
+             basal.area_c2 = (ba.surv.t2 + ba.rec)) %>% 
+      arrange(plotcode)
     
     # proportion of large trees
     surv_c2
+    plotarea <- surv_c2 %>% dplyr::select(plotcode,plot.area) %>% 
+      unique() %>% arrange(plotcode)
     large.trees <- surv_c2 %>% 
+      bind_rows(rec) %>% 
       group_by(plotcode) %>% 
       summarise(n = n(),
                 large30 = sum(d >= 30),
-                prop.large = (large30/n)*100)
+                prop.large = (large30/n)*100) %>% 
+      arrange(plotcode) %>% 
+      mutate(n.ha = n/plotarea$plot.area)
     
     #final carbon tables ------
     carbon_estimates_per_plot <- data.frame(Bs0 = surv.agc$Bs0,
@@ -192,6 +198,7 @@ demography.and.dynamics <- function (survival,mortality,recruitment,metric){
                                             plotcode = time$plotcode,
                                             prop.large = large.trees$prop.large,
                                             n.stems.c2 = large.trees$n,
+                                            n.stems.c2.ha = large.trees$n.ha,
                                             gains = all.carbon.gains.c2$gains, # survivors' growth + recruitment
                                             incr.surv = surv.agc$surv.agc_gain.ha.yr, # survivors' growth per ha/yr
                                             basal.area.total$basal.area_c1,
@@ -255,13 +262,20 @@ demography.and.dynamics <- function (survival,mortality,recruitment,metric){
       mutate(across(recruits, coalesce, 0)) %>% #in case there is zero recruitment
       mutate(Nt = (Nst)+(recruits))
     
+    plotarea <- surv %>% filter(census.n == 2) %>%
+      dplyr::select(plotcode,plot.area) %>% 
+      unique() %>% arrange(plotcode)
+    
     demographic_rates_per_plot <- data.frame(N0 = initial.number$N0,
                                              Nt = final.number$Nt,
                                              Nst = surv.n.c2$Nst,
                                              t = time$time.interv,
                                              plotcode = time$plotcode) %>% 
+      arrange(plotcode) %>% 
       dplyr::mutate(N.ind.inicial = N0,
+                    N.ind.inicial.ha = N0/plotarea$plot.area,
                     N.ind.final = Nt,
+                    N.ind.final.ha = Nt/plotarea$plot.area,
                     ma = 1-((Nst/N0)^(1/t)),
                     raf = 1-((Nst/Nt)^(1/t)), 
                     turnover = (ma+raf)/2) %>% 
