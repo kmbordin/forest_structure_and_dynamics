@@ -208,15 +208,6 @@ server <- function(input, output, session) {
         }
       return(data)
     },
-    level = function(data, level){
-      if(level == "community"){
-        data <- data 
-      }
-      if(level == "species"){
-        data <- data %>% 
-          mutate(plotcode = species)
-      return(data)
-    }},
     correct.zombie = function (data){
       
       #' @description generates correction for stems assigned as alive, dead, alive
@@ -800,6 +791,24 @@ server <- function(input, output, session) {
       survc <- bind_rows(surv_c1,surv_c2)
       return(survc)
     },
+    level = function(survival,mortality,recruitment, level){
+      if(level == "community"){
+        survival <- survival
+        mortality <- mortality
+        recruitment <- recruitment
+      }
+      if(level == "species"){
+        survival <- survival %>% 
+          mutate(plotcode = species)
+        mortality <- mortality %>% 
+          mutate(plotcode = species)
+        recruitment <- recruitment %>% 
+          mutate(plotcode = species)
+      }
+      return(list(
+        survival = survival,
+        recruitment = recruitment,
+        mortality = mortality))},
     demography.and.dynamics = function (survival,mortality,recruitment,metric){
       
       #' @description generate data for demographic rates and forest dynamics
@@ -1249,10 +1258,7 @@ server <- function(input, output, session) {
     traits <- dados_traits()    # ← em vez de trait.data
     resultados <- list("original dataset" = df)
     
-    # aplica f0 (level)
-    df <- minhas_funcoes$level(df, level = input$level)
-    resultados[["level"]] <- as.data.frame(df)
-    
+   
     # aplica f0 (ontogeny)
     df <- minhas_funcoes$ontogeny(df, ontogeny = input$ontogeny)
     resultados[["ontogeny"]] <- as.data.frame(df)
@@ -1299,14 +1305,23 @@ server <- function(input, output, session) {
     } else {
       # Mantém o survival original quando for "vital"
       survival_corrigido <- demography_result$survival
-      resultados[["unmatch.stems"]] <- data.frame(Nota = "Funcao unmatch.stems so funciona quando metric = 'carbon'")
+      resultados[["unmatch.stems"]] <- data.frame(Nota = "The function 'unmatch.stems'
+                                                   only works when metric = 'carbon'")
     }
+    # aplica f0 (level)
+    df <- minhas_funcoes$level(survival = survival_corrigido,
+                               mortality = demography_result$mortality, 
+                               recruitment = demography_result$recruitment, 
+                               level = input$level)
+    resultados[["level"]] <- as.data.frame(df$survival)
+    resultados[["level"]] <- as.data.frame(df$recruitment)
+    resultados[["level"]] <- as.data.frame(df$mortality) 
     
     # aplica f6 (demography and forest dynamics) com parametro do input
     df.dyn <- minhas_funcoes$demography.and.dynamics(
-      survival = survival_corrigido,  # USA O SURVIVAL CORRIGIDO QUANDO metric=carbon
-      mortality = demography_result$mortality, 
-      recruitment = demography_result$recruitment,
+      survival = df$survival,  # USA O SURVIVAL CORRIGIDO QUANDO metric=carbon
+      mortality = df$mortality, 
+      recruitment = df$recruitment,
       metric = input$metric
     )
     resultados[["forest.dynamics"]] <- as.data.frame(df.dyn)
