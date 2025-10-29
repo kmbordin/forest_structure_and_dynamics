@@ -103,6 +103,8 @@ ui <- fluidPage(
           
           selectInput("ontogeny",label = "ontogenetic stage",
                       choices = c("juvenile", "adult","all"), selected = "all"),
+          selectInput("level",label = "community or species",
+                      choices = c("community","species"), selected = "community"),
           selectInput("census.n",label = "correct.census and demography: census.number:",
                       choices = c("1_2", "2_3", "3_4", "4_5", "6_7","7_8"), selected = "1_2"),
           numericInput("dbh", "correct.census and carbon estimates: dbh:", value = 10, min = 0),
@@ -206,6 +208,15 @@ server <- function(input, output, session) {
         }
       return(data)
     },
+    level = function(data, level){
+      if(level == "community"){
+        data <- data 
+      }
+      if(level == "species"){
+        data <- data %>% 
+          mutate(plotcode = species)
+      return(data)
+    }},
     correct.zombie = function (data){
       
       #' @description generates correction for stems assigned as alive, dead, alive
@@ -1237,6 +1248,10 @@ server <- function(input, output, session) {
     df <- dados_parcelas()      # ← em vez de dados_iniciais
     traits <- dados_traits()    # ← em vez de trait.data
     resultados <- list("original dataset" = df)
+    
+    # aplica f0 (level)
+    df <- minhas_funcoes$level(df, level = input$level)
+    resultados[["level"]] <- as.data.frame(df)
     
     # aplica f0 (ontogeny)
     df <- minhas_funcoes$ontogeny(df, ontogeny = input$ontogeny)
