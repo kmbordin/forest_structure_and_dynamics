@@ -57,9 +57,7 @@ data.complete <- data.frame(plotcode = c(rep("A", 9), rep("B", 13),rep("C",3)),
 trait <- data.complete %>% 
   ungroup() %>% 
   dplyr::select(species,WD) %>% 
-  unique() %>% 
-  remove_rownames() %>% column_to_rownames(var = "species")
-
+  unique() 
 shiny::runApp("R/shiny.R")
 
 # testing all functions ------

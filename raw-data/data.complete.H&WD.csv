@@ -1,0 +1,26 @@
+"","plotcode","plot.area","census.yr","treeid","stem.gr.id","species","d","genus","family","latitude","longitude","census.n","Height","WD"
+"1","A",1,2000,1,NA,"Araucaria angustifolia",19,"Araucaria","Araucariaceae",-27.84,-50.23,1,12,0.47
+"2","A",1,2000,2,NA,"Myrcia retorta",25,"Myrcia","Myrtaceae",-27.84,-50.23,1,10,0.81
+"3","A",1,2010,1,NA,"Araucaria angustifolia",11,"Araucaria","Araucariaceae",-27.84,-50.23,2,3,0.47
+"4","A",1,2010,2,NA,"Myrcia retorta",100,"Myrcia","Myrtaceae",-27.84,-50.23,2,4,0.81
+"5","A",1,2024,1,NA,"Araucaria angustifolia",19,"Araucaria","Araucariaceae",-27.84,-50.23,3,5,0.47
+"6","A",1,2024,2,NA,"Myrcia retorta",100,"Myrcia","Myrtaceae",-27.84,-50.23,3,6,0.81
+"7","A",1,2010,3,NA,"Apuleia leiocarpa",10,"Apuleia","Fabaceae",-27.84,-50.23,2,7,0.87
+"8","A",1,2000,8,NA,"Apuleia leiocarpa",10,"Apuleia","Fabaceae",-27.84,-50.23,1,8,0.87
+"9","A",1,2024,8,NA,"Apuleia leiocarpa",16,"Apuleia","Fabaceae",-27.84,-50.23,3,9,0.87
+"10","B",0.2,2005,4,NA,"Alchornea triplinervia",50,"Alchornea","Euphorbiaceae",-29.61,-50.18,1,10,0.4
+"11","B",0.2,2005,9,NA,"Casearia sylvestris",21,"Casearia","Salicaceae",-29.61,-50.18,1,11,0.62
+"12","B",0.2,2005,5,NA,"Eugenia uniflora",16,"Eugenia","Myrtaceae",-29.61,-50.18,1,5,0.72
+"13","B",0.2,2020,4,NA,"Alchornea triplinervia",55,"Alchornea","Euphorbiaceae",-29.61,-50.18,2,13,0.4
+"14","B",0.2,2005,6,NA,"Casearia sylvestris",22,"Casearia","Salicaceae",-29.61,-50.18,1,7,0.62
+"15","B",0.2,2020,7,NA,"Alsophila setosa",10,"Alsophila","Cyatheaceae",-29.61,-50.18,2,15,0
+"16","B",0.2,2005,80,"8a","Myrcia retorta",10,"Myrcia","Myrtaceae",-29.61,-50.18,1,16,0.81
+"17","B",0.2,2005,81,"8a","Myrcia retorta",10,"Myrcia","Myrtaceae",-29.61,-50.18,1,17,0.81
+"18","B",0.2,2020,81,"8a","Myrcia retorta",11,"Myrcia","Myrtaceae",-29.61,-50.18,2,10,0.81
+"19","B",0.2,2005,90,"9a","Myrcia retorta",10,"Myrcia","Myrtaceae",-29.61,-50.18,1,19,0.81
+"20","B",0.2,2005,91,"9a","Myrcia retorta",10,"Myrcia","Myrtaceae",-29.61,-50.18,1,20,0.81
+"21","B",0.2,2020,92,"9a","Myrcia retorta",12,"Myrcia","Myrtaceae",-29.61,-50.18,2,3,0.81
+"22","B",0.2,2020,93,"9a","Myrcia retorta",12,"Myrcia","Myrtaceae",-29.61,-50.18,2,22,0.81
+"23","C",0.3,2000,333,NA,"Myrceugenia myrcioides",20,"Myrceugenia","Myrtaceae",-29.61,-50.18,1,12,0.62
+"24","C",0.3,2000,334,NA,"Araucaria angustifolia",10,"Araucaria","Araucariaceae",-29.61,-50.18,1,10,0.47
+"25","C",0.3,2010,333,NA,"Myrceugenia myrcioides",20,"Myrceugenia","Myrtaceae",-29.61,-50.18,2,12,0.62
