@@ -1,6 +1,6 @@
 ---
 author: "Kauane Maiara Bordin"
-date: "2025-10-28"
+date: "2025-11-10"
 ---
 
 # Forest structure and dynamics: standard codes 🌳
@@ -203,6 +203,6 @@ If you find **any** inconsistency in the codes **please** contact kauanembordin[
 
 # \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\--
 
-Most recent news! I have been playing to develop a shiny.app to run these codes quick and easily. It is a very (*very)* simple version, but it is working for the default parameters so far. I will keep updating it when I have some spare time :)
+Most recent news! I have been playing to develop a [shiny.app](http://kmbordin.shinyapps.io/forest_structure_and_dynamics) to run these codes quick and easily. It is a very (*very)* simple version, but it is working for the default parameters so far. I will keep updating it when I have some spare time :)
 
-In the shiny app there is an extra parameter `ontogeny`, where: juvenile == \<5cm dbh; adult == \>=5cm dbh; and all == all dbhs in the data.frame.
+In the shiny.app there is an extra parameter `ontogeny`, where: juvenile == \<5cm dbh; adult == \>=5cm dbh; and all == all dbhs in the data.frame.
