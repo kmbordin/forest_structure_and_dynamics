@@ -164,18 +164,20 @@ demography <- function (data,metric,rate,census.n){
     
     # multi-stemmed trees
     multi_census1 <- census1 %>% 
+      mutate(basalarea = pi * (d / 2)^2) %>% 
       filter(!is.na(stem.gr.id == TRUE)) %>% # filter all stems with stem group id
       group_by(stem.gr.id, plotcode, family, species) %>% 
       summarise(census.yr = mean(census.yr),
                 n.stems = n(),# count the number of multi-stems per individual
-                d = max(d)) %>% 
+                basal.area.summed = sum (basalarea)) %>%
       rename(treeid = stem.gr.id) %>% 
-      mutate(treeid = as.character(treeid))
+      mutate(treeid = as.character(treeid), 
+           d = 2 * sqrt(basal.area.summed/ pi))
     
     # single-stemmed trees
     one_census1 <- census1 %>% 
       filter(!is.na(stem.gr.id) == FALSE) %>% # filter all stem that do not have stem group id
-      select(treeid, plotcode, family, species, census.yr, d) %>% 
+      dplyr::select(treeid, plotcode, family, species, census.yr, d) %>% 
       rename(census.yr = census.yr)%>% 
       mutate(treeid=as.character(treeid),
              n.stems = 1)
@@ -190,20 +192,21 @@ demography <- function (data,metric,rate,census.n){
     
     # multi-stemmed trees
     multi_census2 <- census2 %>% 
-      filter(!is.na(stem.gr.id == TRUE)) %>% # filter all stem with stem group id
+      mutate(basalarea = pi * (d / 2)^2) %>% 
+      filter(!is.na(stem.gr.id == TRUE)) %>% # filter all stems with stem group id
       group_by(stem.gr.id, plotcode, family, species) %>% 
       summarise(census.yr = mean(census.yr),
-                d = max(d),
-                n.stems = n()) %>% # count multi-stemmed trees
+                n.stems = n(),# count the number of multi-stems per individual
+                basal.area.summed = sum (basalarea)) %>%
       rename(treeid = stem.gr.id) %>% 
-      mutate(treeid=as.character(treeid),
-             n.stems = 1,
-             status=1)
+      mutate(treeid = as.character(treeid), 
+             d = 2 * sqrt(basal.area.summed/ pi),
+             status = ifelse(d>0, 1 ,0))
     
     # single-stemmed trees
     one_census2 <- census2 %>% 
       filter(!is.na(stem.gr.id) == FALSE) %>% # filter all stem that do not have stem group id
-      select(treeid, plotcode, family, species, census.yr, d) %>% 
+      dplyr::select(treeid, plotcode, family, species, census.yr, d) %>% 
       rename(census.yr = census.yr,
              d = d)%>% 
       mutate(treeid = as.character(treeid),
@@ -217,9 +220,11 @@ demography <- function (data,metric,rate,census.n){
       dplyr::select(plotcode,plot.area) %>% 
       arrange(plotcode) %>% unique()
     
-    data <- full_join(total_census1, total_census2) %>% 
+    full_data <- full_join(total_census1, total_census2) %>% 
       ungroup() %>% 
       left_join(plotarea, by="plotcode")
+    data <- full_data
+    print(dim(data))
     
     print("In case of the warning 
       'Caused by warning in `max()`[...]'
