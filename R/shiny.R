@@ -1235,10 +1235,17 @@ server <- function(input, output, session) {
         mutate(plotcode = rownames(comm.c1.density)) %>% 
         relocate(plotcode)
       
-      functionalcensus1 <- dbFD(x = trait1, a = comm1)
-      print("functional metrics from census 1 successfully obtained")
+      num_traits <- ncol(trait1)
+      trait1 <- trait1 %>%
+        { if("X" %in% names(.)) select(., -X) else . }
+      trait2 <- trait2 %>%
+        { if("X" %in% names(.)) select(., -X) else . }
       
-      functionalcensus2 <- dbFD(x = trait2, a = comm2)
+      functionalcensus1 <- dbFD(x = trait1, a = comm1,
+                                calc.FRic = FALSE,calc.FDiv = (num_traits > 1))
+      print("functional metrics from census 1 successfully obtained")
+      functionalcensus2 <- dbFD(x = trait2, a = comm2,
+                                calc.FRic = FALSE,calc.FDiv = (num_traits > 1))
       print("functional metrics from census 2 successfully obtained")
       
       plotcodes = data.frame(plotcodes = diversity.density$plotcode)

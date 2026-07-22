@@ -67,7 +67,18 @@ correct.diameter <- function (data,census.numb,dbh){
       filter(plotcode %in% c2)
     data = bind_rows(census1,census2)
   }
-  
+  if(census.numb=="2_4"){ # data filtering for census 2 and 4
+    #census1
+    census1 = data %>% filter(census.n == 2) %>% 
+      mutate(census.n = replace(census.n, census.n == "2", "1")) 
+    #census2
+    census2 = data %>% filter(census.n == 4) %>% 
+      mutate(census.n = replace(census.n, census.n == "4", "2")) 
+    c2 = unique(census2$plotcode)
+    census1 <- census1 %>% 
+      filter(plotcode %in% c2)
+    data = bind_rows(census1,census2)
+  }
   if(census.numb=="3_4"){ # data filtering for census 3 and 4
     #census1
     census1 = data %>% filter(census.n == 3) %>% 

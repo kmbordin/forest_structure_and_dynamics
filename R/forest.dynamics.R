@@ -38,8 +38,8 @@ demography.and.dynamics <- function (survival,mortality,recruitment,metric){
   
   # save plot information
   plots <- unique(surv$plotcode)
-  print(setdiff(plots,mort$plotcode))# plots with zero mortality
-  print(setdiff(plots,rec$plotcode)) # plots with zero recruitment
+  print("plots with zero mortality"); print(setdiff(plots,mort$plotcode))
+  print("plots with zero recruitment"); print(setdiff(plots,rec$plotcode)) 
   
   if(metric == "carbon"){
     print("METRIC == CARBON")

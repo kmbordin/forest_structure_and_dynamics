@@ -97,7 +97,7 @@ all.diversity <- function (survival,mortality,recruitment,trait){
   nmds_census1
   nmds.census1.scores <- as.data.frame(nmds_census1$points)
   
-  png('results/NMDS.census1.png', units="in", width=5, height=5, res=300)
+  #png('results/NMDS.census1.png', units="in", width=5, height=5, res=300)
   ggplot(nmds.census1.scores, mapping = aes(x = MDS1, y = MDS2)) + geom_point()+
     geom_vline(xintercept=0, color="black", linetype="dotted") +
     geom_hline(yintercept=0, color="black", linetype="dotted") +
@@ -106,13 +106,13 @@ all.diversity <- function (survival,mortality,recruitment,trait){
                         panel.grid.minor = element_blank(),
                         legend.position = "bottom",
                         panel.background = element_blank())
-    dev.off()
+    #dev.off()
   
   nmds_census2 <- metaMDS(comm.c2.density, distance = "bray", autotransform = FALSE)
   nmds_census2
   nmds.census2.scores <- as.data.frame(nmds_census1$points)
   
-  png('results/NMDS.census2.png', units="in", width=5, height=5, res=300)
+  #png('results/NMDS.census2.png', units="in", width=5, height=5, res=300)
   ggplot(nmds.census2.scores, mapping = aes(x = MDS1, y = MDS2)) + geom_point()+
     geom_vline(xintercept=0, color="black", linetype="dotted") +
     geom_hline(yintercept=0, color="black", linetype="dotted") +
@@ -121,7 +121,7 @@ all.diversity <- function (survival,mortality,recruitment,trait){
           panel.grid.minor = element_blank(),
           legend.position = "bottom",
           panel.background = element_blank())
-    dev.off()
+    #dev.off()
     
     print("Running functional metrics")
     # functional diversity and composition
@@ -130,13 +130,13 @@ all.diversity <- function (survival,mortality,recruitment,trait){
   trait
   
   trait1 <- trait %>% 
-    mutate(sp = rownames(trait)) %>% 
+    mutate(sp = trait$sp) %>% 
     filter(sp %in% colnames(comm.c1.density)) %>% 
     arrange(sp) %>%  # order rownames
     remove_rownames() %>% column_to_rownames(var = 'sp')
     
   trait2 <- trait %>% 
-    mutate(sp = rownames(trait)) %>% 
+    mutate(sp = trait$sp) %>% 
     filter(sp %in% colnames(comm.c2.density)) %>% 
     arrange(sp) %>%  # order rownames
     remove_rownames() %>% column_to_rownames(var = 'sp')
@@ -167,10 +167,18 @@ all.diversity <- function (survival,mortality,recruitment,trait){
   comm.c2.density <- comm.c2.density %>% 
     mutate(plotcode = rownames(comm.c1.density)) %>% 
     relocate(plotcode)
-
-  functionalcensus1 <- dbFD(x = trait1, a = comm1)
+  
+  num_traits <- ncol(trait1)
+  trait1 <- trait1 %>%
+    { if("X" %in% names(.)) select(., -X) else . }
+  trait2 <- trait2 %>%
+    { if("X" %in% names(.)) select(., -X) else . }
+  
+  functionalcensus1 <- dbFD(x = trait1, a = comm1,
+                            calc.FRic = FALSE,calc.FDiv = (num_traits > 1))#calc.FRic = (num_traits > 1)
   print("functional metrics from census 1 successfully obtained")
-  functionalcensus2 <- dbFD(x = trait2, a = comm2)
+  functionalcensus2 <- dbFD(x = trait2, a = comm2,
+                            calc.FRic = FALSE,calc.FDiv = (num_traits > 1))##calc.FRic = (num_traits > 1)
   print("functional metrics from census 2 successfully obtained")
   
   estimates <- list(taxonomic.diversity = diversity.density, 

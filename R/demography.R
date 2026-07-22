@@ -64,6 +64,18 @@ demography <- function (data,metric,rate,census.n){
       filter(plotcode %in% c2)
     data = bind_rows(census1,census2)
   }
+  if(census.n=="2_4"){
+    #census1
+    census1 = data %>% filter(census.n==2) %>% 
+      mutate(census.n = replace(census.n, census.n == "2", "1")) 
+    #census2
+    census2 = data %>% filter(census.n==4) %>% 
+      mutate(census.n = replace(census.n, census.n == "4", "2")) 
+    c2 = unique(census2$plotcode)
+    census1 <- census1 %>% 
+      filter(plotcode %in% c2)
+    data = bind_rows(census1,census2)
+  }
   
   if(census.n=="3_4"){
     #census1
@@ -205,7 +217,7 @@ demography <- function (data,metric,rate,census.n){
       dplyr::select(plotcode,plot.area) %>% 
       arrange(plotcode) %>% unique()
     
-    full_data <- full_join(total_census1, total_census2) %>% 
+    data <- full_join(total_census1, total_census2) %>% 
       ungroup() %>% 
       left_join(plotarea, by="plotcode")
     
