@@ -21,6 +21,10 @@
 "20","B",0.2,2005,91,"9a","Myrcia retorta",10,"Myrcia","Myrtaceae",-29.61,-50.18,1,20
 "21","B",0.2,2020,92,"9a","Myrcia retorta",12,"Myrcia","Myrtaceae",-29.61,-50.18,2,3
 "22","B",0.2,2020,93,"9a","Myrcia retorta",12,"Myrcia","Myrtaceae",-29.61,-50.18,2,22
-"23","C",0.3,2000,333,NA,"Myrceugenia myrcioides",20,"Myrceugenia","Myrtaceae",-29.61,-50.18,1,12
+"23","C",0.3,2000,333,NA,"Eugenia indet",20,"Eugenia","Myrtaceae",-29.61,-50.18,1,12
 "24","C",0.3,2000,334,NA,"Araucaria angustifolia",10,"Araucaria","Araucariaceae",-29.61,-50.18,1,10
-"25","C",0.3,2010,333,NA,"Myrceugenia myrcioides",20,"Myrceugenia","Myrtaceae",-29.61,-50.18,2,12
+"25","C",0.3,2010,333,NA,"Eugenia indet",20,"Eugenia","Myrtaceae",-29.61,-50.18,2,12
+"26","C",0.3,2000,335,"335a","Myrcia retorta",11,"Myrcia","Myrtaceae",-29.61,-50.18,1,10
+"27","C",0.3,2010,335,"335a","Myrcia retorta",0,"Myrcia","Myrtaceae",-29.61,-50.18,2,10
+"28","C",0.3,2000,336,"335a","Myrcia retorta",15,"Myrcia","Myrtaceae",-29.61,-50.18,1,0
+"29","C",0.3,2010,336,"335a","Myrcia retorta",0,"Myrcia","Myrtaceae",-29.61,-50.18,2,0
