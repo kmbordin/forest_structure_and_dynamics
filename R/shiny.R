@@ -650,14 +650,7 @@ server <- function(input, output, session) {
       
       if(metric == "vital") {
         census1 <- data %>% filter(census.n == 1)
-        # multi_census1 <- census1 %>% filter(!is.na(stem.gr.id)) %>%
-        #   group_by(stem.gr.id, plotcode, family, species) %>%
-        #   summarise(census.yr = mean(census.yr),
-        #             n.stems = n(),
-        #             d = max(d)) %>%
-        #   rename(treeid = stem.gr.id) %>%
-        #   mutate(treeid = as.character(treeid))
-        # multi-stemmed trees
+
         multi_census1 <- census1 %>% 
           mutate(basalarea = pi * (d / 2)^2) %>% 
           filter(!is.na(stem.gr.id == TRUE)) %>% # filter all stems with stem group id
@@ -676,14 +669,8 @@ server <- function(input, output, session) {
         total_census1 <- bind_rows(multi_census1, one_census1) %>%
           mutate(status = 1, census.n = 1)
         
-        # census2 <- data %>% filter(census.n == 2)
-        # multi_census2 <- census2 %>% filter(!is.na(stem.gr.id)) %>%
-        #   group_by(stem.gr.id, plotcode, family, species) %>%
-        #   summarise(census.yr = mean(census.yr),
-        #             d = max(d),
-        #             n.stems = n()) %>%
-        #   rename(treeid = stem.gr.id) %>%
-        #   mutate(treeid = as.character(treeid))
+        census2 <- data %>% filter(census.n == 2)
+
         # multi-stemmed trees
         multi_census2 <- census2 %>% 
           mutate(basalarea = pi * (d / 2)^2) %>% 
@@ -1217,19 +1204,17 @@ server <- function(input, output, session) {
       trait
       
       trait1 <- trait %>% 
-        mutate(sp = rownames(trait)) %>% 
-        mutate(sp = trait[,1]) %>% 
+        mutate(sp = trait$sp) %>% 
         filter(sp %in% colnames(comm.c1.density)) %>% 
         arrange(sp) %>%  # order rownames
-        remove_rownames() %>% column_to_rownames(var = "sp")
+        remove_rownames() %>% column_to_rownames(var = 'sp')
       print(trait1)
-      
+
       trait2 <- trait %>% 
-        mutate(sp = rownames(trait)) %>% 
-        mutate(sp = trait[,1]) %>% 
+        mutate(sp = trait$sp) %>% 
         filter(sp %in% colnames(comm.c2.density)) %>% 
         arrange(sp) %>%  # order rownames
-        remove_rownames() %>% column_to_rownames(var = "sp") 
+        remove_rownames() %>% column_to_rownames(var = 'sp')
       print(trait2)
       
       # order colnames
