@@ -82,16 +82,16 @@ all.diversity <- function (survival,mortality,recruitment,trait){
 
   # taxonomic diversity calculated through hill numbers (Chao et al 2014)
   #where q0=richness, q1=shannon index, and q=2 inv.simpson index;rarefied richness is also shown
-  diversity.density <- data.frame(rich.dens.census1 = hill_taxa(comm = comm.c1.density, q = 0),
-                                shannon.dens.census1 = hill_taxa(comm = comm.c1.density, q = 1),
-                                inv.simpson.dens.census1 = hill_taxa(comm = comm.c1.density, q = 2),
-                                rich.dens.census2 = hill_taxa(comm = comm.c2.density, q = 0),
-                                shannon.dens.census2 = hill_taxa(comm = comm.c2.density, q = 1),
-                                inv.simpson.dens.census2 = hill_taxa(comm = comm.c2.density, q = 2),
-                                rarefied.richness.c1 = Srare.census1,
-                                rarefied.richness.c2 = Srare.census2,
-                                plotcode = rownames(comm.c1.density))
-  
+  diversity.density <- data.frame(plotcode = rownames(comm.c1.density),
+                                  rich.dens.census1 = hill_taxa(comm = comm.c1.density, q = 0),
+                                  shannon.dens.census1 = hill_taxa(comm = comm.c1.density, q = 1),
+                                  inv.simpson.dens.census1 = hill_taxa(comm = comm.c1.density, q = 2),
+                                  rich.dens.census2 = hill_taxa(comm = comm.c2.density, q = 0),
+                                  shannon.dens.census2 = hill_taxa(comm = comm.c2.density, q = 1),
+                                  inv.simpson.dens.census2 = hill_taxa(comm = comm.c2.density, q = 2),
+                                  rarefied.richness.c1 = Srare.census1,
+                                  rarefied.richness.c2 = Srare.census2,
+                                  plotcode = rownames(comm.c1.density))
   # NMDS ordination
   nmds_census1 <- metaMDS(comm.c1.density, distance = "bray", autotransform = FALSE)
   nmds_census1
@@ -134,12 +134,15 @@ all.diversity <- function (survival,mortality,recruitment,trait){
     filter(sp %in% colnames(comm.c1.density)) %>% 
     arrange(sp) %>%  # order rownames
     remove_rownames() %>% column_to_rownames(var = 'sp')
+  print(trait1)
     
   trait2 <- trait %>% 
     mutate(sp = trait$sp) %>% 
     filter(sp %in% colnames(comm.c2.density)) %>% 
     arrange(sp) %>%  # order rownames
     remove_rownames() %>% column_to_rownames(var = 'sp')
+  print(trait2)
+  
   
   # order colnames
   comm.c1.density <- comm.c1.density %>% 
