@@ -194,7 +194,9 @@ community_matrix_c1 list
 
 community_matrix_c2 list
     Community matrix descrived by species abundance per plot in census 2  
-  
+
+
+# to be included -------
 functional_census1 list
     nbsp: number of species (richness) in census 1
     sing.sp: functionally singular species per plot in census 1
