@@ -260,7 +260,7 @@ server <- function(input, output, session) {
       
       return(result)
     },
-    correct.diameter <- function (data,census.n,dbh,H.info,WD.info){
+    correct.diameter = function (data,census.n,dbh,H.info,WD.info){
       
       #' @description correct diameter to avoid abnormal growth rates
       #' @author Kauane Maiara Bordin (kauanembordin[at]gmail.com)
@@ -280,15 +280,15 @@ server <- function(input, output, session) {
         filter(d >= dbh) %>%  # to ensure same dbh threshold for all stems. dbh must be in cm!
         filter(! family %in% ferns.families) # remove ferns families
       
-      original.census.n = census.numb # save original info
+      original.census.n = census.n # save original info
       
-      if(census.numb=="1_2") { # data filtering for census 1 and 2
+      if(census.n=="1_2") { # data filtering for census 1 and 2
         census1 = data %>% filter(census.n == 1)
         census2 = data %>% filter(census.n == 2)
         data = bind_rows(census1,census2)
       }
       
-      if(census.numb=="2_3"){ # data filtering for census 2 and 3
+      if(census.n=="2_3"){ # data filtering for census 2 and 3
         #census1
         census1 = data %>% filter(census.n == 2) %>% 
           mutate(census.n = replace(census.n, census.n == "2", "1")) 
@@ -300,7 +300,7 @@ server <- function(input, output, session) {
           filter(plotcode %in% c2)
         data = bind_rows(census1,census2)
       }
-      if(census.numb=="2_4"){ # data filtering for census 2 and 4
+      if(census.n=="2_4"){ # data filtering for census 2 and 4
         #census1
         census1 = data %>% filter(census.n == 2) %>% 
           mutate(census.n = replace(census.n, census.n == "2", "1")) 
@@ -312,7 +312,7 @@ server <- function(input, output, session) {
           filter(plotcode %in% c2)
         data = bind_rows(census1,census2)
       }
-      if(census.numb=="3_4"){ # data filtering for census 3 and 4
+      if(census.n=="3_4"){ # data filtering for census 3 and 4
         #census1
         census1 = data %>% filter(census.n == 3) %>% 
           mutate(census.n = replace(census.n, census.n == "3", "1")) 
@@ -325,7 +325,7 @@ server <- function(input, output, session) {
         data = bind_rows(census1,census2)
       }
       
-      if(census.numb=="4_5"){ # data filtering for census 4 and 5
+      if(census.n=="4_5"){ # data filtering for census 4 and 5
         #census1
         census1 = data %>% filter(census.n == 4) %>% 
           mutate(census.n = replace(census.n, census.n == "4", "1")) 
@@ -345,7 +345,7 @@ server <- function(input, output, session) {
         data = bind_rows(census1,census2)
       }
       
-      if(census.numb=="6_7"){ # data filtering for census 6 and 7
+      if(census.n=="6_7"){ # data filtering for census 6 and 7
         #census1
         census1 = data %>% filter(census.n == 6) %>% 
           mutate(census.n = replace(census.n, census.n == "6", "1")) 
@@ -1281,8 +1281,8 @@ server <- function(input, output, session) {
     df <- minhas_funcoes$correct.diameter(df, 
                                           census.n = input$census.n,
                                           dbh = input$dbh,
-                                          WD.info = input$WD.info,
-                                          H.info = input$H.info)
+                                          H.info = input$H.info,
+                                          WD.info = input$WD.info)
     resultados[["correct.diameter"]] <- as.data.frame(df)
     
     
@@ -1343,8 +1343,8 @@ server <- function(input, output, session) {
       trait = traits  
     )
     resultados[["taxonomic.diversity"]] <- as.data.frame(all.div$taxonomic.diversity)
-    resultados[["functional_census1"]] <- as.data.frame(all.div$functional_census1)
-    resultados[["functional_census2"]] <- as.data.frame(all.div$functional_census1)
+    #resultados[["functional_census1"]] <- as.data.frame(all.div$functional_census1)
+    #resultados[["functional_census2"]] <- as.data.frame(all.div$functional_census2)
     resultados[["comm.c1.density"]] <- as.data.frame(all.div$community_matrix_c1)
     resultados[["comm.c2.density"]] <- as.data.frame(all.div$community_matrix_c2)
     resultados[["plotcodes"]] <- as.data.frame(all.div$plotcodes)

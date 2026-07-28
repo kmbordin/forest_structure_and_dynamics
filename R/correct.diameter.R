@@ -50,15 +50,15 @@ correct.diameter <- function (data,census.n,dbh,H.info,WD.info){
     filter(d >= dbh) %>%  # to ensure same dbh threshold for all stems. dbh must be in cm!
     filter(! family %in% ferns.families) # remove ferns families
   
-  original.census.n = census.numb # save original info
+  original.census.n = census.n # save original info
   
-  if(census.numb=="1_2") { # data filtering for census 1 and 2
+  if(census.n=="1_2") { # data filtering for census 1 and 2
     census1 = data %>% filter(census.n == 1)
     census2 = data %>% filter(census.n == 2)
     data = bind_rows(census1,census2)
   }
   
-  if(census.numb=="2_3"){ # data filtering for census 2 and 3
+  if(census.n=="2_3"){ # data filtering for census 2 and 3
     #census1
     census1 = data %>% filter(census.n == 2) %>% 
       mutate(census.n = replace(census.n, census.n == "2", "1")) 
@@ -70,7 +70,7 @@ correct.diameter <- function (data,census.n,dbh,H.info,WD.info){
       filter(plotcode %in% c2)
     data = bind_rows(census1,census2)
   }
-  if(census.numb=="2_4"){ # data filtering for census 2 and 4
+  if(census.n=="2_4"){ # data filtering for census 2 and 4
     #census1
     census1 = data %>% filter(census.n == 2) %>% 
       mutate(census.n = replace(census.n, census.n == "2", "1")) 
@@ -82,7 +82,7 @@ correct.diameter <- function (data,census.n,dbh,H.info,WD.info){
       filter(plotcode %in% c2)
     data = bind_rows(census1,census2)
   }
-  if(census.numb=="3_4"){ # data filtering for census 3 and 4
+  if(census.n=="3_4"){ # data filtering for census 3 and 4
     #census1
     census1 = data %>% filter(census.n == 3) %>% 
       mutate(census.n = replace(census.n, census.n == "3", "1")) 
@@ -95,7 +95,7 @@ correct.diameter <- function (data,census.n,dbh,H.info,WD.info){
     data = bind_rows(census1,census2)
   }
   
-  if(census.numb=="4_5"){ # data filtering for census 4 and 5
+  if(census.n=="4_5"){ # data filtering for census 4 and 5
     #census1
     census1 = data %>% filter(census.n == 4) %>% 
       mutate(census.n = replace(census.n, census.n == "4", "1")) 
@@ -115,7 +115,7 @@ correct.diameter <- function (data,census.n,dbh,H.info,WD.info){
     data = bind_rows(census1,census2)
   }
   
-  if(census.numb=="6_7"){ # data filtering for census 6 and 7
+  if(census.n=="6_7"){ # data filtering for census 6 and 7
     #census1
     census1 = data %>% filter(census.n == 6) %>% 
       mutate(census.n = replace(census.n, census.n == "6", "1")) 
