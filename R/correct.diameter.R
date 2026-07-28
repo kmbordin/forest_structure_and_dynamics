@@ -1,7 +1,7 @@
 ############################################################
 ##############  CORRECT DIAMETER  ##########################
 ############################################################
-### Code updated by Kauane M Bordin at 02 Oct 2025
+### Code updated by Kauane M Bordin at 28 Jul 2026
 
 ### Description: Sometimes long-term monitoring fails in tracking stem diameter
 # and we observe abnormal absolute growth rates (positive or negative).
@@ -30,7 +30,7 @@ library(tidyverse)
 # census.yr instead of Census.Date
 # census.yr in format as.numeric
 
-correct.diameter <- function (data,census.numb,dbh){
+correct.diameter <- function (data,census.n,dbh,H.info,WD.info){
   
   #' @description correct diameter to avoid abnormal growth rates
   #' @author Kauane Maiara Bordin (kauanembordin[at]gmail.com)
@@ -40,7 +40,10 @@ correct.diameter <- function (data,census.numb,dbh){
   #' data: stem-level information from ForestPlots.net format, but be careful with the required format for column names
   #' census.n: "1_2", "2_3" ... "6_7"
   #' dbh: minimum dbh to apply the correction - please check your data! here dbh is in cm 
-   
+  #' H.info: TRUE or FALSE; If H.info == TRUE, a vector of individual height must be provided 
+  #' WD.info: TRUE or FALSE; If WD.info == TRUE, a vector of individual WD must be provided 
+  
+  
   ferns.families <- c("Cyatheaceae", "Dicksoniaceae","Pteridaceae") #fern families to be removed
   
   data <- data %>% 
@@ -159,30 +162,51 @@ correct.diameter <- function (data,census.numb,dbh){
     pivot_wider(id_cols = NULL,names_from = census.n ,values_from = census.yr) %>% 
     rename(census.number1 = `1`,
            census.number2 = `2`)
-  
-  #summarise species information
-  overall.height.mean <- mean(data$Height, na.rm = TRUE)
-  non_na_heights <- data$Height[!is.na(data$Height)]
-  
-  if (length(non_na_heights) > 0) {
-    overall.height.mean <- mean(non_na_heights)
-  } else {
-    overall.height.mean <- NA 
+  if(WD.info==TRUE){
+    data <- data
+  }
+  if(WD.info==FALSE){
+    data <- data %>% 
+      mutate(WD = NA)
   }
   
-  data.summarised3 <- data %>% 
-    ungroup() %>% 
-    dplyr::select(species,family,genus,WD,Height,treeid,census.n) %>% 
-    ungroup() %>% 
-    group_by(species) %>%
-    mutate(WD = coalesce(WD, unique(WD[!is.na(WD)]))) %>% # includes the WD of former zombie tree
-    ungroup() %>% 
-    group_by(treeid) %>%
-    mutate(Height1 = (mean(Height, na.rm = TRUE))) %>% # includes the mean height of former zombie tree
-    mutate(Height = coalesce(Height1,overall.height.mean),
-           census.n = as.numeric(census.n)) %>% 
-    unique()
-  
+  if(H.info==TRUE){
+    #summarise species information
+    overall.height.mean <- mean(data$Height, na.rm = TRUE)
+    non_na_heights <- data$Height[!is.na(data$Height)]
+    
+    if (length(non_na_heights) > 0) {
+      overall.height.mean <- mean(non_na_heights)
+    } else {
+      overall.height.mean <- NA 
+    }
+    
+    data.summarised3 <- data %>% 
+      ungroup() %>% 
+      dplyr::select(species,family,genus,WD,Height,treeid,census.n) %>% 
+      ungroup() %>% 
+      group_by(species) %>%
+      mutate(WD = coalesce(WD, unique(WD[!is.na(WD)]))) %>% # includes the WD of former zombie tree
+      ungroup() %>% 
+      group_by(treeid) %>%
+      mutate(Height1 = (mean(Height, na.rm = TRUE))) %>% # includes the mean height of former zombie tree
+      mutate(Height = coalesce(Height1,overall.height.mean),
+             census.n = as.numeric(census.n)) %>% 
+      unique()
+    
+  }
+    if(H.info==FALSE){
+      data.summarised3 <- data %>% 
+        ungroup() %>% 
+        dplyr::select(species,family,genus,WD,treeid,census.n) %>% 
+        ungroup() %>% 
+        mutate(Height = NA) %>% 
+        group_by(species) %>%
+        mutate(WD = coalesce(WD, unique(WD[!is.na(WD)]))) %>% # includes the WD of former zombie tree
+        ungroup() %>% 
+        mutate(census.n = as.numeric(census.n)) %>% 
+        unique() 
+    }
   # the following code effectively corrects for the dbh between census 
   # the corrections are applied to dbhs that present abnormal growth (negative or positive).
   # abnormal negative growth relates to growth rates lower than -0.5 cm/yr
@@ -225,13 +249,21 @@ correct.diameter <- function (data,census.numb,dbh){
     group_by(census.n,treeid,census.yr) %>% 
     left_join(data.summarised3, by = c("species","census.n","treeid")) %>% # unite species info
     dplyr::select(plotcode,plot.area,census.n,census.yr,treeid,stem.gr.id,species,d,genus,family,latitude,longitude,WD,Height) %>% 
-    mutate(stem.gr.id = as.character(stem.gr.id))
-  
+    mutate(stem.gr.id = as.character(stem.gr.id)) %>% 
+    ungroup() %>% 
+    group_by(species) %>%
+    fill(genus, family, WD, Height, .direction = "downup") %>%
+    ungroup()
   data <- correct.dbh # set the dataframe of corrected dbh as the default
+  
+  if(H.info == TRUE){
+    data <- data %>% 
+      mutate(Height = ifelse(is.na(Height == TRUE), mean(Height, na.rm=TRUE), Height)) 
+      }
   return(data)
 }
 
 # usage: ------------------------------------------------------------------ 
-# data.correct.dbh.10cm.census1_2 <- correct.diameter (data = data, census.n = "1_2", dbh = 10)
-# data.correct.dbh.5cm.census2_3 <- correct.diameter (data = data, census.n = "2_3", dbh = 5)
+# data.correct.dbh.10cm.census1_2 <- correct.diameter (data = data, census.n = "1_2", dbh = 10,H.info = TRUE,WD.info = TRUE)
+# data.correct.dbh.5cm.census2_3 <- correct.diameter (data = data, census.n = "2_3", dbh = 5,H.info = TRUE,WD.info = TRUE)
 

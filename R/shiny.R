@@ -259,8 +259,8 @@ server <- function(input, output, session) {
         bind_rows(census.two)
       
       return(result)
-    } ,
-    correct.diameter = function (data,census.n,dbh, WD.info, H.info){
+    },
+    correct.diameter <- function (data,census.n,dbh,H.info,WD.info){
       
       #' @description correct diameter to avoid abnormal growth rates
       #' @author Kauane Maiara Bordin (kauanembordin[at]gmail.com)
@@ -270,6 +270,9 @@ server <- function(input, output, session) {
       #' data: stem-level information from ForestPlots.net format, but be careful with the required format for column names
       #' census.n: "1_2", "2_3" ... "6_7"
       #' dbh: minimum dbh to apply the correction - please check your data! here dbh is in cm 
+      #' H.info: TRUE or FALSE; If H.info == TRUE, a vector of individual height must be provided 
+      #' WD.info: TRUE or FALSE; If WD.info == TRUE, a vector of individual WD must be provided 
+      
       
       ferns.families <- c("Cyatheaceae", "Dicksoniaceae","Pteridaceae") #fern families to be removed
       
@@ -277,15 +280,15 @@ server <- function(input, output, session) {
         filter(d >= dbh) %>%  # to ensure same dbh threshold for all stems. dbh must be in cm!
         filter(! family %in% ferns.families) # remove ferns families
       
-      original.census.n = census.n # save original info
+      original.census.n = census.numb # save original info
       
-      if(census.n=="1_2") { # data filtering for census 1 and 2
+      if(census.numb=="1_2") { # data filtering for census 1 and 2
         census1 = data %>% filter(census.n == 1)
         census2 = data %>% filter(census.n == 2)
         data = bind_rows(census1,census2)
       }
       
-      if(census.n=="2_3"){ # data filtering for census 2 and 3
+      if(census.numb=="2_3"){ # data filtering for census 2 and 3
         #census1
         census1 = data %>% filter(census.n == 2) %>% 
           mutate(census.n = replace(census.n, census.n == "2", "1")) 
@@ -297,8 +300,19 @@ server <- function(input, output, session) {
           filter(plotcode %in% c2)
         data = bind_rows(census1,census2)
       }
-      
-      if(census.n=="3_4"){ # data filtering for census 3 and 4
+      if(census.numb=="2_4"){ # data filtering for census 2 and 4
+        #census1
+        census1 = data %>% filter(census.n == 2) %>% 
+          mutate(census.n = replace(census.n, census.n == "2", "1")) 
+        #census2
+        census2 = data %>% filter(census.n == 4) %>% 
+          mutate(census.n = replace(census.n, census.n == "4", "2")) 
+        c2 = unique(census2$plotcode)
+        census1 <- census1 %>% 
+          filter(plotcode %in% c2)
+        data = bind_rows(census1,census2)
+      }
+      if(census.numb=="3_4"){ # data filtering for census 3 and 4
         #census1
         census1 = data %>% filter(census.n == 3) %>% 
           mutate(census.n = replace(census.n, census.n == "3", "1")) 
@@ -311,7 +325,7 @@ server <- function(input, output, session) {
         data = bind_rows(census1,census2)
       }
       
-      if(census.n=="4_5"){ # data filtering for census 4 and 5
+      if(census.numb=="4_5"){ # data filtering for census 4 and 5
         #census1
         census1 = data %>% filter(census.n == 4) %>% 
           mutate(census.n = replace(census.n, census.n == "4", "1")) 
@@ -331,25 +345,13 @@ server <- function(input, output, session) {
         data = bind_rows(census1,census2)
       }
       
-      if(census.n=="6_7"){ # data filtering for census 6 and 7
+      if(census.numb=="6_7"){ # data filtering for census 6 and 7
         #census1
         census1 = data %>% filter(census.n == 6) %>% 
           mutate(census.n = replace(census.n, census.n == "6", "1")) 
         #census2
         census2 = data %>% filter(census.n == 7) %>% 
           mutate(census.n = replace(census.n, census.n == "7", "2")) 
-        c2 = unique(census2$plotcode)
-        census1 <- census1 %>% 
-          filter(plotcode %in% c2)
-        data = bind_rows(census1,census2)
-      }
-      if(census.n=="7_8"){ # data filtering for census 6 and 7
-        #census1
-        census1 = data %>% filter(census.n == 7) %>% 
-          mutate(census.n = replace(census.n, census.n == "7", "1")) 
-        #census2
-        census2 = data %>% filter(census.n == 8) %>% 
-          mutate(census.n = replace(census.n, census.n == "8", "2")) 
         c2 = unique(census2$plotcode)
         census1 <- census1 %>% 
           filter(plotcode %in% c2)
@@ -390,21 +392,6 @@ server <- function(input, output, session) {
         pivot_wider(id_cols = NULL,names_from = census.n ,values_from = census.yr) %>% 
         rename(census.number1 = `1`,
                census.number2 = `2`)
-      if(H.info==TRUE){
-        overall.height.mean <- mean(data$Height, na.rm = TRUE)
-        non_na_heights <- data$Height[!is.na(data$Height)]
-        
-        if (length(non_na_heights) > 0) {
-          overall.height.mean <- mean(non_na_heights)
-        } else {
-          overall.height.mean <- NA }
-      }
-      #summarise species information
-      
-      if(H.info==FALSE){
-        data <- data %>% 
-          mutate(Height = NA)
-      }
       if(WD.info==TRUE){
         data <- data
       }
@@ -413,7 +400,17 @@ server <- function(input, output, session) {
           mutate(WD = NA)
       }
       
-      if(WD.info==TRUE & H.info==TRUE){
+      if(H.info==TRUE){
+        #summarise species information
+        overall.height.mean <- mean(data$Height, na.rm = TRUE)
+        non_na_heights <- data$Height[!is.na(data$Height)]
+        
+        if (length(non_na_heights) > 0) {
+          overall.height.mean <- mean(non_na_heights)
+        } else {
+          overall.height.mean <- NA 
+        }
+        
         data.summarised3 <- data %>% 
           ungroup() %>% 
           dplyr::select(species,family,genus,WD,Height,treeid,census.n) %>% 
@@ -426,34 +423,20 @@ server <- function(input, output, session) {
           mutate(Height = coalesce(Height1,overall.height.mean),
                  census.n = as.numeric(census.n)) %>% 
           unique()
+        
       }
-      if(WD.info==TRUE & H.info==FALSE){
+      if(H.info==FALSE){
         data.summarised3 <- data %>% 
           ungroup() %>% 
-          dplyr::select(species,family,genus,WD,Height,treeid,census.n) %>% 
+          dplyr::select(species,family,genus,WD,treeid,census.n) %>% 
           ungroup() %>% 
+          mutate(Height = NA) %>% 
           group_by(species) %>%
           mutate(WD = coalesce(WD, unique(WD[!is.na(WD)]))) %>% # includes the WD of former zombie tree
-          ungroup() 
-      }
-      if(WD.info==FALSE & H.info==TRUE){
-        data.summarised3 <- data %>% 
           ungroup() %>% 
-          dplyr::select(species,family,genus,WD,Height,treeid,census.n) %>% 
-          ungroup() %>% 
-          group_by(treeid) %>%
-          mutate(Height1 = (mean(Height, na.rm = TRUE))) %>% # includes the mean height of former zombie tree
-          mutate(Height = coalesce(Height1,overall.height.mean),
-                 census.n = as.numeric(census.n)) %>% 
-          unique()
+          mutate(census.n = as.numeric(census.n)) %>% 
+          unique() 
       }
-      if(WD.info==FALSE & H.info==FALSE) {
-        data.summarised3 <- data %>% 
-          ungroup() %>% 
-          dplyr::select(species,family,genus,WD,Height,treeid,census.n) %>% 
-          unique()
-      }
-      
       # the following code effectively corrects for the dbh between census 
       # the corrections are applied to dbhs that present abnormal growth (negative or positive).
       # abnormal negative growth relates to growth rates lower than -0.5 cm/yr
@@ -496,9 +479,17 @@ server <- function(input, output, session) {
         group_by(census.n,treeid,census.yr) %>% 
         left_join(data.summarised3, by = c("species","census.n","treeid")) %>% # unite species info
         dplyr::select(plotcode,plot.area,census.n,census.yr,treeid,stem.gr.id,species,d,genus,family,latitude,longitude,WD,Height) %>% 
-        mutate(stem.gr.id = as.character(stem.gr.id))
-      
+        mutate(stem.gr.id = as.character(stem.gr.id)) %>% 
+        ungroup() %>% 
+        group_by(species) %>%
+        fill(genus, family, WD, Height, .direction = "downup") %>%
+        ungroup()
       data <- correct.dbh # set the dataframe of corrected dbh as the default
+      
+      if(H.info == TRUE){
+        data <- data %>% 
+          mutate(Height = ifelse(is.na(Height == TRUE), mean(Height, na.rm=TRUE), Height)) 
+      }
       return(data)
     },
     carbon.est = function (data, WD.info, H.info, dbh){
@@ -1170,38 +1161,38 @@ server <- function(input, output, session) {
       nmds_census1 <- metaMDS(comm.c1.density, distance = "bray", autotransform = FALSE)
       nmds_census1
       nmds.census1.scores <- as.data.frame(nmds_census1$points)
-      
-      #png('results/NMDS.census1.png', units="in", width=5, height=5, res=300)
-      nmds.c1 <- ggplot(nmds.census1.scores, mapping = aes(x = MDS1, y = MDS2)) + geom_point()+
-        geom_vline(xintercept=0, color="black", linetype="dotted") +
-        geom_hline(yintercept=0, color="black", linetype="dotted") +
-        theme_light()+
-        theme(panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank(),
-              legend.position = "bottom",
-              panel.background = element_blank())
-      #dev.off()
-      
+
+      # #png('results/NMDS.census1.png', units="in", width=5, height=5, res=300)
+      # nmds.c1 <- ggplot(nmds.census1.scores, mapping = aes(x = MDS1, y = MDS2)) + geom_point()+
+      #   geom_vline(xintercept=0, color="black", linetype="dotted") +
+      #   geom_hline(yintercept=0, color="black", linetype="dotted") +
+      #   theme_light()+
+      #   theme(panel.grid.major = element_blank(),
+      #         panel.grid.minor = element_blank(),
+      #         legend.position = "bottom",
+      #         panel.background = element_blank())
+      # #dev.off()
+      # 
       nmds_census2 <- metaMDS(comm.c2.density, distance = "bray", autotransform = FALSE)
       nmds_census2
       nmds.census2.scores <- as.data.frame(nmds_census1$points)
-      
-      #png('results/NMDS.census2.png', units="in", width=5, height=5, res=300)
-      nmds.c2 <- ggplot(nmds.census2.scores, mapping = aes(x = MDS1, y = MDS2)) + geom_point()+
-        geom_vline(xintercept=0, color="black", linetype="dotted") +
-        geom_hline(yintercept=0, color="black", linetype="dotted") +
-        theme_light()+
-        theme(panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank(),
-              legend.position = "bottom",
-              panel.background = element_blank())
-      #dev.off()
-      
-      print("Running functional metrics")
-      # functional diversity and composition
-      comm.c1.density
-      comm.c2.density
-      trait
+
+      # #png('results/NMDS.census2.png', units="in", width=5, height=5, res=300)
+      # nmds.c2 <- ggplot(nmds.census2.scores, mapping = aes(x = MDS1, y = MDS2)) + geom_point()+
+      #   geom_vline(xintercept=0, color="black", linetype="dotted") +
+      #   geom_hline(yintercept=0, color="black", linetype="dotted") +
+      #   theme_light()+
+      #   theme(panel.grid.major = element_blank(),
+      #         panel.grid.minor = element_blank(),
+      #         legend.position = "bottom",
+      #         panel.background = element_blank())
+      # #dev.off()
+      # 
+      # print("Running functional metrics")
+      # # functional diversity and composition
+      # comm.c1.density
+      # comm.c2.density
+      # trait
       
       trait1 <- trait %>% 
         mutate(sp = trait$sp) %>% 
@@ -1218,54 +1209,54 @@ server <- function(input, output, session) {
       print(trait2)
       
       # order colnames
-      comm.c1.density <- comm.c1.density %>% 
+      comm.c1.density <- comm.c1.density %>%
         dplyr::select(order(colnames(comm.c1.density)))
-      comm.c2.density <- comm.c2.density %>% 
+      comm.c2.density <- comm.c2.density %>%
         dplyr::select(order(colnames(comm.c2.density)))
-      
+
       print("checking species match for community and trait data frame")
       print("community at census 1")
       print(setdiff(colnames(comm.c1.density), rownames(trait1)))
       print(setdiff(rownames(trait1),colnames(comm.c1.density)))
-      
+
       print("community at census 2")
       print(setdiff(colnames(comm.c2.density), rownames(trait2)))
       print(setdiff(rownames(trait2),colnames(comm.c2.density)))
-      
+
       print("If there is a mismatch, the code will stop")
-      
-      comm1 <- as.matrix(comm.c1.density)
-      comm2 <- as.matrix(comm.c2.density)
-      comm.c1.density <- comm.c1.density %>% 
-        mutate(plotcode = rownames(comm.c1.density)) %>% 
-        relocate(plotcode)
-      comm.c2.density <- comm.c2.density %>% 
-        mutate(plotcode = rownames(comm.c1.density)) %>% 
-        relocate(plotcode)
-      
-      num_traits <- ncol(trait1)
-      trait1 <- trait1 %>%
-        { if("X" %in% names(.)) select(., -X) else . }
-      trait2 <- trait2 %>%
-        { if("X" %in% names(.)) select(., -X) else . }
-      
-      functionalcensus1 <- dbFD(x = trait1, a = comm1,
-                                calc.FRic = FALSE,calc.FDiv = (num_traits > 1))
-      print("functional metrics from census 1 successfully obtained")
-      functionalcensus2 <- dbFD(x = trait2, a = comm2,
-                                calc.FRic = FALSE,calc.FDiv = (num_traits > 1))
-      print("functional metrics from census 2 successfully obtained")
-      
+      # 
+      # comm1 <- as.matrix(comm.c1.density)
+      # comm2 <- as.matrix(comm.c2.density)
+      # comm.c1.density <- comm.c1.density %>% 
+      #   mutate(plotcode = rownames(comm.c1.density)) %>% 
+      #   relocate(plotcode)
+      # comm.c2.density <- comm.c2.density %>% 
+      #   mutate(plotcode = rownames(comm.c1.density)) %>% 
+      #   relocate(plotcode)
+      # 
+      # num_traits <- ncol(trait1)
+      # trait1 <- trait1 %>%
+      #   { if("X" %in% names(.)) select(., -X) else . }
+      # trait2 <- trait2 %>%
+      #   { if("X" %in% names(.)) select(., -X) else . }
+      # 
+      # functionalcensus1 <- dbFD(x = trait1, a = comm1,
+      #                           calc.FRic = FALSE,calc.FDiv = (num_traits > 1))
+      # print("functional metrics from census 1 successfully obtained")
+      # functionalcensus2 <- dbFD(x = trait2, a = comm2,
+      #                           calc.FRic = FALSE,calc.FDiv = (num_traits > 1))
+      # print("functional metrics from census 2 successfully obtained")
+      # 
       plotcodes = data.frame(plotcodes = diversity.density$plotcode)
-      
+       
       estimates <- list(taxonomic.diversity = diversity.density, 
                         plotcodes = plotcodes,
-                        functional_census1 = functionalcensus1,
-                        functional_census2 = functionalcensus2,
+                        #functional_census1 = functionalcensus1,
+                        #functional_census2 = functionalcensus2,
                         community_matrix_c1 = comm.c1.density,
                         community_matrix_c2 = comm.c2.density,
-                        nmds.c1 = nmds.c1,
-                        nmds.c2 = nmds.c2) 
+                        nmds.c1 = nmds_census1,
+                        nmds.c2 = nmds_census2) 
       
       return(estimates)
     })
@@ -1324,17 +1315,17 @@ server <- function(input, output, session) {
     } else {
       # Mantém o survival original quando for "vital"
       survival_corrigido <- demography_result$survival
-      resultados[["unmatch.stems"]] <- data.frame(Nota = "The function 'unmatch.stems'
+      resultados[["unmatch.stems"]] <- data.frame(Note = "The function 'unmatch.stems'
                                                    only works when metric = 'carbon'")
     }
-    # aplica f0 (level)
+    # aplica f0 (level-community or species)
     df <- minhas_funcoes$level(survival = survival_corrigido,
                                mortality = demography_result$mortality, 
                                recruitment = demography_result$recruitment, 
                                level = input$level)
-    resultados[["level"]] <- as.data.frame(df$survival)
-    resultados[["level"]] <- as.data.frame(df$recruitment)
-    resultados[["level"]] <- as.data.frame(df$mortality) 
+    # resultados[["level"]] <- as.data.frame(df$survival)
+    # resultados[["level"]] <- as.data.frame(df$recruitment)
+    # resultados[["level"]] <- as.data.frame(df$mortality) 
     
     # aplica f6 (demography and forest dynamics) com parametro do input
     df.dyn <- minhas_funcoes$demography.and.dynamics(
