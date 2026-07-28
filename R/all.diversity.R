@@ -161,35 +161,38 @@ all.diversity <- function (survival,mortality,recruitment,trait){
   
   print("If there is a mismatch, the code will stop")
   
-  comm1 <- as.matrix(comm.c1.density)
-  comm2 <- as.matrix(comm.c2.density)
-  
-  comm.c1.density <- comm.c1.density %>% 
-    mutate(plotcode = rownames(comm.c1.density)) %>% 
-    relocate(plotcode)
-  comm.c2.density <- comm.c2.density %>% 
-    mutate(plotcode = rownames(comm.c1.density)) %>% 
-    relocate(plotcode)
-  
-  num_traits <- ncol(trait1)
-  trait1 <- trait1 %>%
-    { if("X" %in% names(.)) select(., -X) else . }
-  trait2 <- trait2 %>%
-    { if("X" %in% names(.)) select(., -X) else . }
-  
-  functionalcensus1 <- dbFD(x = trait1, a = comm1,
-                            calc.FRic = FALSE,calc.FDiv = (num_traits > 1))#calc.FRic = (num_traits > 1)
-  print("functional metrics from census 1 successfully obtained")
-  functionalcensus2 <- dbFD(x = trait2, a = comm2,
-                            calc.FRic = FALSE,calc.FDiv = (num_traits > 1))##calc.FRic = (num_traits > 1)
-  print("functional metrics from census 2 successfully obtained")
+  # comm1 <- as.matrix(comm.c1.density)
+  # comm2 <- as.matrix(comm.c2.density)
+  # 
+  # comm.c1.density <- comm.c1.density %>% 
+  #   mutate(plotcode = rownames(comm.c1.density)) %>% 
+  #   relocate(plotcode)
+  # comm.c2.density <- comm.c2.density %>% 
+  #   mutate(plotcode = rownames(comm.c1.density)) %>% 
+  #   relocate(plotcode)
+  # 
+  # num_traits <- ncol(trait1)
+  # trait1 <- trait1 %>%
+  #   { if("X" %in% names(.)) select(., -X) else . }
+  # trait2 <- trait2 %>%
+  #   { if("X" %in% names(.)) select(., -X) else . }
+  # 
+  # functionalcensus1 <- dbFD(x = trait1, a = comm1,
+  #                           calc.FRic = FALSE,calc.FDiv = (num_traits > 1))#calc.FRic = (num_traits > 1)
+  # print("functional metrics from census 1 successfully obtained")
+  # functionalcensus2 <- dbFD(x = trait2, a = comm2,
+  #                           calc.FRic = FALSE,calc.FDiv = (num_traits > 1))##calc.FRic = (num_traits > 1)
+  # print("functional metrics from census 2 successfully obtained")
+  plotcodes = data.frame(plotcodes = diversity.density$plotcode)
   
   estimates <- list(taxonomic.diversity = diversity.density, 
-                    functional_census1 = functionalcensus1,
-                    functional_census2 = functionalcensus2,
+                    plotcodes = plotcodes,
+                    #functional_census1 = functionalcensus1,
+                    #functional_census2 = functionalcensus2,
                     community_matrix_c1 = comm.c1.density,
-                    community_matrix_c2 = comm.c2.density) 
-  
+                    community_matrix_c2 = comm.c2.density,
+                    nmds.c1 = nmds_census1,
+                    nmds.c2 = nmds_census2)   
   return(estimates)
 }
 # usage: ------------------------------------------------------------------ 
