@@ -69,11 +69,12 @@ shiny::runApp("R/shiny.R")
 # testing all functions ------
 data.correct.for.zombie <- correct.zombie (data = data.complete)
 data.correct.dbh.10cm.census1_2 <- correct.diameter (data = data.correct.for.zombie, 
-                                                     census.numb = "1_2", dbh = 10)
-data.correct.dbh.10cm.census2_3 <- correct.diameter (data = data.correct.for.zombie, 
-                                                     census.numb = "2_3", dbh = 10)
+                                                     census.n = "1_2", dbh = 10,H.info = TRUE,WD.info = TRUE)
+data.correct.dbh.10cm.census2_3 <- correct.diameter (data = data.complete, 
+                                                     census.n = "2_3", dbh = 10,H.info = TRUE,WD.info = TRUE)
 # WD.info==TRUE and H.info==TRUE
 carb = carbon.est(data = data.correct.dbh.10cm.census1_2, WD.info = TRUE, H.info = TRUE, dbh = 10)
+carb = carbon.est(data = data.correct.dbh.10cm.census2_3, WD.info = TRUE, H.info = TRUE, dbh = 10)
 
 # WD.info==FALSE and H.info==FALSE
 data2 = data.correct.dbh.10cm.census1_2 %>% dplyr::select(-c(WD,Height))
@@ -88,12 +89,12 @@ data4 = data.correct.dbh.10cm.census1_2 %>% dplyr::select(-c(WD))
 carb4 = carbon.est(data = data4, WD.info = FALSE, H.info = TRUE,dbh = 10)
 
 data <- carb
-survival.vital <- demography(data = data, metric = "vital", rate = "survival", census.n = "1_2")
-recruitment.vital <- demography(data = data, metric = "vital", rate = "recruitment", census.n = "1_2")
-mortality.vital <- demography(data = data, metric = "vital", rate = "mortality", census.n = "1_2")
-survival.carbon <- demography(data = data, metric = "carbon", rate = "survival", census.n = "1_2")
-recruitment.carbon <- demography(data = data, metric = "carbon", rate = "recruitment", census.n = "1_2")
-mortality.carbon <- demography(data = data, metric = "carbon", rate = "mortality", census.n = "1_2")
+survival.vital <- demography(data = data, metric = "vital", rate = "survival", census.n = "2_3")
+recruitment.vital <- demography(data = data, metric = "vital", rate = "recruitment", census.n = "2_3")
+mortality.vital <- demography(data = data, metric = "vital", rate = "mortality", census.n = "2_3")
+survival.carbon <- demography(data = data, metric = "carbon", rate = "survival", census.n = "2_3")
+recruitment.carbon <- demography(data = data, metric = "carbon", rate = "recruitment", census.n = "2_3")
+mortality.carbon <- demography(data = data, metric = "carbon", rate = "mortality", census.n = "2_3")
 
 survival.carbon <- unmatch.stems(data.survival.carbon = survival.carbon)
 demographic.rates <- demography.and.dynamics(survival = survival.vital,
