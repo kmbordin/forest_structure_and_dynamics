@@ -1,6 +1,8 @@
+[![DOI](https://zenodo.org/badge/1067993466.svg)](https://doi.org/10.5281/zenodo.21750154)
+
 ---
 author: "Kauane Maiara Bordin"
-date: "2026-07-21"
+date: "2026-08-01"
 output:
   word_document: default
   pdf_document: default
@@ -224,6 +226,9 @@ If you find **any** inconsistency in the codes **please** contact kauanembordin[
 
 # \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\--
 
+
+
+# to be included in the future ---
 Most recent news! I have been playing to develop a [shiny.app](http://kmbordin.shinyapps.io/forest_structure_and_dynamics) to run these codes quick and easily. It is a very (*very)* simple version, but it is working for the default parameters so far. I will keep updating it when I have some spare time :)
 
 In the shiny.app there is an extra parameter `ontogeny`, where: juvenile == \<5cm dbh; adult == \>=5cm dbh; and all == all dbhs in the data.frame.
