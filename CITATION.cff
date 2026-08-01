@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: "Bordin"
+given-names: "Kauane Maiara"
+orcid: "https://orcid.org/0000-0003-3871-6293"
+- family-names: "Bordin"
+given-names: "Kauane Maiara"
+title: "Forest structure and dynamics app"
+version: "1.0.0"
+doi: "10.5281/zenodo.21750155"
+date-released: "2026-08-01"
+url: "https://github.com/kmbordin/forest_structure_and_dynamics"
