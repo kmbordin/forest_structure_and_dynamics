@@ -476,7 +476,7 @@ server <- function(input, output, session) {
         dplyr::select(-c(census.number1,census.number2,original.time1,original.time2,census)) %>% 
         drop_na(d) %>% # drop the NA values in dbh
         ungroup() %>%
-        group_by(census.n,treeid,census.yr) %>% 
+        #group_by(census.n,treeid,census.yr) %>% 
         left_join(data.summarised3, by = c("species","census.n","treeid")) %>% # unite species info
         dplyr::select(plotcode,plot.area,census.n,census.yr,treeid,stem.gr.id,species,d,genus,family,latitude,longitude,WD,Height) %>% 
         mutate(stem.gr.id = as.character(stem.gr.id)) %>% 
@@ -484,12 +484,24 @@ server <- function(input, output, session) {
         group_by(species) %>%
         fill(genus, family, WD, Height, .direction = "downup") %>%
         ungroup()
-      data <- correct.dbh # set the dataframe of corrected dbh as the default
+      
+      data.summarised3 <- data.summarised3 %>% 
+        ungroup() %>% 
+        dplyr::select(species,genus,family,WD) %>% unique()
+      i <- match(correct.dbh$species, data.summarised3$species)
+      
+      correct.dbh <- correct.dbh %>%
+        mutate(family = ifelse(is.na(family), data.summarised3$family[i], family),
+               genus = ifelse(is.na(genus), data.summarised3$genus[i], genus),
+               WD = ifelse(is.na(WD),data.summarised3$WD[i],WD))
+      
+      data <- correct.dbh %>% unique()# set the dataframe of corrected dbh as the default
       
       if(H.info == TRUE){
         data <- data %>% 
-          mutate(Height = ifelse(is.na(Height == TRUE), mean(Height, na.rm=TRUE), Height)) 
-      }
+          mutate(Height = ifelse(is.na(Height == TRUE), 
+                                 mean(Height, na.rm=TRUE), Height))      
+        }
       return(data)
     },
     carbon.est = function (data, WD.info, H.info, dbh){

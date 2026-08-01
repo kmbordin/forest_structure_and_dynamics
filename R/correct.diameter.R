@@ -253,8 +253,20 @@ correct.diameter <- function (data,census.n,dbh,H.info,WD.info){
     ungroup() %>% 
     group_by(species) %>%
     fill(genus, family, WD, Height, .direction = "downup") %>%
+    fill(genus, family, WD, Height, .direction = "updown") %>%
     ungroup()
-  data <- correct.dbh # set the dataframe of corrected dbh as the default
+  data.summarised3 <- data.summarised3 %>% 
+    ungroup() %>% 
+    dplyr::select(species,genus,family,WD) %>% unique()
+  i <- match(correct.dbh$species, data.summarised3$species)
+  
+  correct.dbh <- correct.dbh %>%
+    mutate(family = ifelse(is.na(family), data.summarised3$family[i], family),
+           genus = ifelse(is.na(genus), data.summarised3$genus[i], genus),
+           WD = ifelse(is.na(WD),data.summarised3$WD[i],WD))
+  
+  data <- correct.dbh %>% unique()# set the dataframe of corrected dbh as the default
+  
   
   if(H.info == TRUE){
     data <- data %>% 

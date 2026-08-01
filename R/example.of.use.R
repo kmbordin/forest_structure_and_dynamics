@@ -73,7 +73,7 @@ data.correct.dbh.10cm.census1_2 <- correct.diameter (data = data.correct.for.zom
 data.correct.dbh.10cm.census2_3 <- correct.diameter (data = data.complete, 
                                                      census.n = "2_3", dbh = 10,H.info = TRUE,WD.info = TRUE)
 # WD.info==TRUE and H.info==TRUE
-carb = carbon.est(data = data.correct.dbh.10cm.census1_2, WD.info = TRUE, H.info = TRUE, dbh = 10)
+# carb = carbon.est(data = data.correct.dbh.10cm.census1_2, WD.info = TRUE, H.info = TRUE, dbh = 10)
 carb = carbon.est(data = data.correct.dbh.10cm.census2_3, WD.info = TRUE, H.info = TRUE, dbh = 10)
 
 # WD.info==FALSE and H.info==FALSE
